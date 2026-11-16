@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use with Claude, Claude Code &amp; any MCP client · LinkedIn Agent</title>
+<meta name="description" content="Install the LinkedIn Agent Claude skill and subagent, and connect the MCP server to Claude Desktop, Claude Code, Cursor or any MCP-compatible LLM.">
+<meta name="keywords" content="Claude skill LinkedIn, Claude Code subagent, MCP server LinkedIn, Model Context Protocol LinkedIn, Cursor MCP LinkedIn">
+<meta name="author" content="jrnoorbaloch">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://jrnoorbaloch.github.io/linkedin-agent/claude.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LinkedIn Agent">
+<meta property="og:title" content="Use with Claude, Claude Code &amp; any MCP client · LinkedIn Agent">
+<meta property="og:description" content="Install the LinkedIn Agent Claude skill and subagent, and connect the MCP server to Claude Desktop, Claude Code, Cursor or any MCP-compatible LLM.">
+<meta property="og:url" content="https://jrnoorbaloch.github.io/linkedin-agent/claude.html">
+<meta property="og:image" content="https://jrnoorbaloch.github.io/linkedin-agent/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Use with Claude, Claude Code &amp; any MCP client · LinkedIn Agent">
+<meta name="twitter:description" content="Install the LinkedIn Agent Claude skill and subagent, and connect the MCP server to Claude Desktop, Claude Code, Cursor or any MCP-compatible LLM.">
+<meta name="twitter:image" content="https://jrnoorbaloch.github.io/linkedin-agent/assets/og.png">
+<meta name="theme-color" content="#0a66c2">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf8;--panel:#fff;--ink:#16191c;--muted:#5b636c;--line:#e7e4de;--brand:#0a66c2;--brand-2:#004182;--soft:#eaf2fb;--code:#f3f1ec;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1113;--panel:#171a1d;--ink:#e9ebee;--muted:#9ba4ad;--line:#2a2f34;--brand:#5aa8ee;--brand-2:#8cc2f5;--soft:#14253a;--code:#1d2125}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;font-size:16px}
+a{color:var(--brand)}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:12px 22px}
+.brand{display:flex;gap:9px;align-items:center;font-weight:750;color:var(--ink);text-decoration:none}
+.brand b{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:#0a66c2;color:#fff;font-size:12px}
+.bar nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.bar nav a{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:14.5px;font-weight:500}
+.bar nav a:hover,.bar nav a.on{color:var(--ink);background:var(--code)}
+.gh{font-size:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:999px;color:var(--ink)}
+main{max-width:1120px;margin:0 auto;padding:40px 22px 80px}
+.doc{max-width:820px}
+h1{font-size:clamp(30px,4.6vw,52px);line-height:1.1;letter-spacing:-.02em;margin:.2em 0 .35em}
+h2{font-size:26px;letter-spacing:-.01em;margin:2em 0 .5em;padding-top:.3em}
+h3{font-size:18px;margin:1.6em 0 .4em}
+.lead{font-size:19px;color:var(--muted);max-width:720px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0}
+.btn{display:inline-block;padding:11px 20px;border-radius:999px;font-weight:650;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--panel)}
+.btn.p{background:#0a66c2;border-color:#0a66c2;color:#fff}
+.btn:hover{filter:brightness(1.05)}
+.shot{border-radius:14px;border:1px solid var(--line);box-shadow:0 20px 50px -20px rgba(0,0,0,.25);width:100%;height:auto;display:block;margin:18px 0}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 14px}
+.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:14.5px}
+.ico{font-size:22px}
+code{background:var(--code);padding:.1em .38em;border-radius:5px;font-size:.9em}
+pre{background:var(--code);padding:16px 18px;border-radius:12px;overflow:auto;font-size:14px;line-height:1.5;border:1px solid var(--line)}
+pre code{background:none;padding:0}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.note{background:var(--soft);border-left:3px solid var(--brand);padding:12px 16px;border-radius:8px;margin:16px 0}
+.tag{display:inline-block;font-size:12px;font-weight:600;background:var(--code);padding:2px 9px;border-radius:999px;color:var(--muted);margin:2px}
+.yes{color:#0b7a46;font-weight:700}.no{color:#b42318;font-weight:700}
+.arch{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.arch div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-weight:600}
+.arch small{display:block;font-weight:400;color:var(--muted)}
+.core{grid-column:1/-1;background:var(--soft)!important;border-color:var(--brand)!important}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+footer .bar{flex-wrap:wrap}
+iframe.demo{width:100%;height:760px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+@media(max-width:760px){.bar nav{display:none}.arch{grid-template-columns:1fr}iframe.demo{height:620px}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Use with Claude, Claude Code & any MCP client", "description": "Install the LinkedIn Agent Claude skill and subagent, and connect the MCP server to Claude Desktop, Claude Code, Cursor or any MCP-compatible LLM.", "url": "https://jrnoorbaloch.github.io/linkedin-agent/claude.html", "author": {"@type": "Person", "name": "jrnoorbaloch"}, "dateModified": "2026-11-17"}</script>
+</head>
+<body>
+<header><div class="bar"><a class="brand" href="index.html"><b>LA</b>LinkedIn Agent</a><nav><a href="index.html" class="">Home</a><a href="getting-started.html" class="">Get started</a><a href="portal.html" class="">Web portal</a><a href="skills.html" class="">Skills</a><a href="claude.html" class="on">Claude & MCP</a><a href="api.html" class="">API</a><a href="faq.html" class="">FAQ</a></nav><a class="gh" href="https://github.com/jrnoorbaloch/linkedin-agent">★ GitHub</a></div></header>
+<main><div class="doc">
+<h1>Claude skill, subagent & MCP</h1>
+<p class="lead">Three ways for an AI assistant to use the agent. Combine them for the best result.</p>
+
+<h2 id="skill">1. The Claude skill</h2>
+<p><code>skill/linkedin-agent/</code> is a single skill that bundles every playbook (hooks, post writing, humanizer, profile, career, engagement, networking, company page, analytics, publishing) and routes each request to the right one. It works on its own: Claude writes everything. With the MCP server connected, it can also queue and publish.</p>
+<pre><code>skill/linkedin-agent/
+├── SKILL.md              # routing, ground rules, workflows
+├── references/           # 13 playbooks, loaded only when needed
+└── scripts/la.py         # stdlib REST client for the portal</code></pre>
+<h3>Install</h3>
+<ul>
+<li><b>Claude apps (claude.ai / desktop):</b> download <a href="downloads/linkedin-agent-skill.zip"><code>linkedin-agent-skill.zip</code></a>, then go to <i>Settings → Capabilities → Skills → Upload skill</i>.</li>
+<li><b>Claude Code:</b> <code>cp -r skill/linkedin-agent ~/.claude/skills/</code> (personal) or <code>.claude/skills/</code> (project).</li>
+</ul>
+
+<h2 id="subagent">2. The subagent (Claude Code)</h2>
+<p><code>agents/linkedin-agent.md</code> defines a LinkedIn manager subagent with routines for the daily post, weekly plan, profile and career overhaul, and weekly review.</p>
+<pre><code>cp agents/linkedin-agent.md ~/.claude/agents/
+# then: "Use the linkedin-agent subagent to plan and draft my week"</code></pre>
+
+<h2 id="mcp">3. The MCP server</h2>
+<p>Any MCP client can drive the agent: Claude Desktop, Claude Code, Cursor, Windsurf, or your own agent.</p>
+<h3>Claude Desktop / Cursor (<code>mcpServers</code> config)</h3>
+<pre><code>{
+  "mcpServers": {
+    "linkedin-agent": { "command": "linkedin-agent", "args": ["mcp"] }
+  }
+}</code></pre>
+<h3>Claude Code</h3>
+<pre><code>claude mcp add linkedin-agent -- linkedin-agent mcp</code></pre>
+<h3>Remote / HTTP</h3>
+<pre><code>linkedin-agent mcp --http      # streamable HTTP transport</code></pre>
+<div class="note">The MCP server and the portal share the same database (<code>LA_DATA_DIR</code>). Connect LinkedIn once in the portal and both can use it.</div>
+<h3>Tools</h3><table><tr><th>Tool</th><th>Purpose</th></tr><tr><td><code>status</code></td><td>LinkedIn connection, LLM, brand profile, post counts</td></tr><tr><td><code>list_skills</code></td><td>All skills with their input fields</td></tr><tr><td><code>run_skill</code></td><td>Run a skill with the agent's own LLM (drafts are saved)</td></tr><tr><td><code>get_skill_prompt</code></td><td>Get the skill's prompt so the calling model writes the content itself</td></tr><tr><td><code>save_draft</code></td><td>Put a post you wrote into the approval queue</td></tr><tr><td><code>list_posts</code></td><td>List posts by status</td></tr><tr><td><code>approve_post</code></td><td>Approve or schedule a draft, only after the user says yes</td></tr><tr><td><code>publish_post</code></td><td>Publish an approved post and return its URL</td></tr><tr><td><code>record_metrics</code></td><td>Store impressions, reactions, comments and reposts</td></tr><tr><td><code>get_brand_profile / update_brand_profile</code></td><td>Read or update voice, audience and pillars</td></tr><tr><td><code>add_story</code></td><td>Add to the Story Bank</td></tr><tr><td><code>list_documents / save_document</code></td><td>Resumes, cover letters, plans</td></tr></table>
+
+<h2 id="safety">Approval gate</h2>
+<p><code>publish_post</code> refuses any post that hasn't been approved. The skill and the subagent both instruct the model to call <code>approve_post</code> only after you explicitly say yes to the exact text.</p>
+
+</div></main>
+<footer><div class="bar"><span>LinkedIn Agent v0.1.0 · MIT License · Not affiliated with LinkedIn Corporation.</span><span style="flex:1"></span><a href="https://github.com/jrnoorbaloch/linkedin-agent">GitHub</a><a href="https://github.com/jrnoorbaloch/linkedin-agent/issues">Issues</a><a href="sitemap.xml">Sitemap</a></div></footer>
+</body>
+</html>

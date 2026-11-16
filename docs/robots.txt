@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /demo/
+Sitemap: https://jrnoorbaloch.github.io/linkedin-agent/sitemap.xml

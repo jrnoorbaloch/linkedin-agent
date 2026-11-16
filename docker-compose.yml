@@ -1,0 +1,10 @@
+services:
+  linkedin-agent:
+    build: .
+    image: linkedin-agent:latest
+    ports:
+      - "8787:8787"
+    env_file: .env
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

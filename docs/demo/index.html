@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinkedIn Agent — Live demo</title>
+<meta name="robots" content="noindex">
+<script src="skills.js"></script>
+<script src="mock.js"></script>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230a66c2'/><text x='16' y='22' font-size='16' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'>LA</text></svg>">
+<style>
+:root{
+  --bg:#f4f2ee;--panel:#fff;--ink:#1d2226;--muted:#5e6670;--line:#e3e1dc;--brand:#0a66c2;--brand-ink:#fff;
+  --brand-soft:#e8f1fb;--ok:#057642;--ok-soft:#e5f4ec;--warn:#915907;--warn-soft:#fdf3e1;--bad:#b42318;--bad-soft:#fdecea;
+  --radius:12px;--shadow:0 1px 2px rgba(0,0,0,.06),0 0 0 1px var(--line);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{--bg:#111315;--panel:#1b1f23;--ink:#e8eaed;--muted:#9aa3ad;--line:#2c3237;--brand:#4d9de0;--brand-soft:#16283a;--ok-soft:#10291c;--warn-soft:#2c2210;--bad-soft:#321514;--ok:#4cc38a;--warn:#e0a84a;--bad:#f07167}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+a{color:var(--brand)}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;padding:4px 10px 18px}
+.logo b{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:var(--brand);color:#fff;font-size:13px}
+nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--ink);text-decoration:none;font-weight:500}
+nav a:hover{background:var(--bg)}
+nav a.active{background:var(--brand-soft);color:var(--brand)}
+nav .sec{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:14px 12px 4px}
+.side-foot{margin-top:auto;font-size:12px;color:var(--muted);padding:10px 12px}
+main{padding:28px 32px;max-width:1180px;width:100%}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 22px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.stat .n{font-size:26px;font-weight:700}.stat .l{color:var(--muted);font-size:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.btn{text-decoration:none;display:inline-block;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 16px;font-weight:600;font-size:13px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 12px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:wait}
+label{display:block;font-weight:600;font-size:12px;margin:12px 0 4px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+textarea{min-height:90px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:-1px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--bg);color:var(--muted)}
+.pill.draft{background:var(--warn-soft);color:var(--warn)}.pill.approved,.pill.scheduled{background:var(--brand-soft);color:var(--brand)}
+.pill.published{background:var(--ok-soft);color:var(--ok)}.pill.failed,.pill.rejected{background:var(--bad-soft);color:var(--bad)}
+.skill{cursor:pointer;transition:transform .1s}
+.skill:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08),0 0 0 1px var(--brand)}
+.skill h3{margin:0 0 4px;font-size:14px}.skill p{margin:0;color:var(--muted);font-size:12.5px}
+.cat{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:22px 0 10px}
+.out{white-space:pre-wrap;background:var(--bg);border-radius:8px;padding:14px;font-size:13.5px;max-height:520px;overflow:auto}
+.post{border:1px solid var(--line);border-radius:var(--radius);padding:16px;background:var(--panel)}
+.post .meta{font-size:12px;color:var(--muted)}
+.post .text{white-space:pre-wrap;margin:10px 0}
+.post textarea{min-height:200px}
+.empty{color:var(--muted);text-align:center;padding:36px}
+.banner{padding:10px 14px;border-radius:8px;margin-bottom:16px;font-weight:500}
+.banner.ok{background:var(--ok-soft);color:var(--ok)}.banner.bad{background:var(--bad-soft);color:var(--bad)}.banner.info{background:var(--brand-soft);color:var(--brand)}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:500;opacity:0;transition:.2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.check{display:flex;gap:8px;align-items:center;padding:6px 0}
+.check i{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;background:var(--bg);color:var(--muted)}
+.check.done i{background:var(--ok);color:#fff}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:13px}
+.menu-btn{display:none}
+@media(max-width:900px){.app{grid-template-columns:1fr}aside{position:fixed;inset:0 30% 0 0;z-index:5;transform:translateX(-100%);transition:.2s}aside.open{transform:none}
+main{padding:18px}.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}.menu-btn{display:inline-block;margin-bottom:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside id="side">
+  <div class="logo"><b>LA</b> LinkedIn Agent</div>
+  <nav id="nav">
+    <a href="#dashboard" data-v="dashboard">🏠 Dashboard</a>
+    <a href="#create" data-v="create">✨ Create</a>
+    <a href="#queue" data-v="queue">📝 Approval queue</a>
+    <a href="#history" data-v="history">📈 History & metrics</a>
+    <div class="sec">Library</div>
+    <a href="#documents" data-v="documents">📄 Documents</a>
+    <a href="#stories" data-v="stories">💡 Story bank</a>
+    <a href="#network" data-v="network">🤝 Network</a>
+    <div class="sec">Setup</div>
+    <a href="#brand" data-v="brand">🎯 Brand profile</a>
+    <a href="#settings" data-v="settings">⚙️ Settings</a>
+  </nav>
+  <div class="side-foot" id="foot">v0.1.0</div>
+</aside>
+<main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEMO = !!window.LA_DEMO;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600)}
+function getToken(){try{return localStorage.getItem("la_token")||""}catch{return ""}}
+
+async function api(path, opts={}){
+  if (DEMO) return window.LA_MOCK(path, opts);
+  const res = await fetch(path, {method: opts.method||"GET", headers: {"content-type":"application/json","x-api-token":getToken()},
+    body: opts.body ? JSON.stringify(opts.body) : undefined});
+  if (res.status === 401){const t=prompt("API token (LA_API_TOKEN):");if(t){try{localStorage.setItem("la_token",t)}catch{}return api(path,opts)}}
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(data.detail || res.statusText);
+  return data;
+}
+async function busy(btn, fn){btn.disabled=true;const old=btn.textContent;btn.textContent="Working…";try{return await fn()}catch(e){toast("⚠️ "+e.message)}finally{btn.disabled=false;btn.textContent=old}}
+function copy(text){navigator.clipboard?.writeText(text);toast("Copied to clipboard")}
+
+const views = {};
+async function route(){
+  const v = (location.hash.slice(1) || "dashboard").split("?")[0];
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("active", a.dataset.v === v.split("/")[0]));
+  $("#side").classList.remove("open");
+  const main = $("#main");
+  main.innerHTML = `<button class="btn menu-btn" onclick="document.getElementById('side').classList.add('open')">☰ Menu</button><div id="view"><div class="empty">Loading…</div></div>`;
+  try { await (views[v.split("/")[0]] || views.dashboard)(v.split("/")[1]); }
+  catch(e){ $("#view").innerHTML = `<div class="banner bad">${esc(e.message)}</div>` }
+}
+window.addEventListener("hashchange", route);
+
+/* ---------------- Dashboard ---------------- */
+views.dashboard = async () => {
+  const d = await api("/api/dashboard");
+  const q = new URLSearchParams(location.search);
+  const li = d.linkedin;
+  const steps = [
+    ["Connect an LLM", !!d.llm.api_key || d.llm.provider==="ollama", "#settings"],
+    ["Fill your brand profile", d.brand_complete >= 6, "#brand"],
+    ["Connect LinkedIn", li.connected, "#settings"],
+    ["Add 3 stories to your Story Bank", d.stories >= 3, "#stories"],
+    ["Draft & approve your first post", d.published + d.approved > 0, "#create/post_writer"],
+  ];
+  $("#view").innerHTML = `
+  ${q.get("linkedin")==="connected"?`<div class="banner ok">✅ LinkedIn connected.</div>`:""}
+  ${q.get("linkedin_error")?`<div class="banner bad">LinkedIn: ${esc(q.get("linkedin_error"))}</div>`:""}
+  ${DEMO?`<div class="banner info">👋 Demo mode — sample data, nothing is saved or posted. <a href="../getting-started.html">Install it yourself →</a></div>`:""}
+  <h1>Good ${new Date().getHours()<12?"morning":"day"}${li.member?.given_name?", "+esc(li.member.given_name):""} 👋</h1>
+  <p class="sub">Your LinkedIn at a glance.</p>
+  <div class="grid g4">
+    <div class="card stat"><div class="n">${d.drafts}</div><div class="l">Drafts waiting for review</div></div>
+    <div class="card stat"><div class="n">${d.approved}</div><div class="l">Approved / scheduled</div></div>
+    <div class="card stat"><div class="n">${d.published}</div><div class="l">Published</div></div>
+    <div class="card stat"><div class="n">${d.engagement_rate ?? "—"}${d.engagement_rate!=null?"%":""}</div><div class="l">Engagement rate (${d.impressions.toLocaleString()} impressions)</div></div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><h3 style="margin-top:0">Setup checklist</h3>
+      ${steps.map(([t,ok,href])=>`<a href="${href}" style="text-decoration:none;color:inherit"><div class="check ${ok?"done":""}"><i>${ok?"✓":""}</i>${t}</div></a>`).join("")}
+    </div>
+    <div class="card"><h3 style="margin-top:0">Today</h3>
+      <p class="sub" style="margin:0 0 12px">Daily draft at <b>${esc(d.schedule.daily_draft_time)}</b> (${esc(d.schedule.timezone)}) · auto-publish <b>${d.schedule.auto_publish?"on at "+esc(d.schedule.publish_time):"off"}</b></p>
+      <div class="row">
+        <button class="btn primary" id="gen">✨ Draft today's post now</button>
+        <a class="btn" href="#queue">Review queue</a>
+        <a class="btn" href="#create/content_planner">Plan my week</a>
+      </div>
+      <p class="sub" style="margin:14px 0 0">LinkedIn: ${li.connected?`<span class="pill published">connected</span> token valid ~${li.expires_in_days} days`:`<span class="pill failed">not connected</span>`}
+      · LLM: <span class="pill">${esc(d.llm.provider)} / ${esc(d.llm.model)}</span></p>
+    </div>
+  </div>`;
+  $("#gen").onclick = e => busy(e.target, async () => { const r = await api("/api/skills/daily_post",{method:"POST",body:{}}); toast("Draft #"+r.post_id+" added to the queue"); location.hash="#queue"; });
+};
+
+/* ---------------- Create (skills) ---------------- */
+views.create = async (id) => {
+  const list = await api("/api/skills");
+  if (!id){
+    const cats = [...new Set(list.map(s=>s.category))];
+    $("#view").innerHTML = `<h1>Create</h1><p class="sub">${list.length} LinkedIn skills, all powered by your own LLM.</p>` +
+      cats.map(c=>`<div class="cat">${esc(c)}</div><div class="grid g3">${list.filter(s=>s.category===c).map(s=>`
+        <div class="card skill" onclick="location.hash='#create/${s.id}'"><h3>${esc(s.title)}</h3><p>${esc(s.description)}</p></div>`).join("")}</div>`).join("");
+    return;
+  }
+  const s = list.find(x=>x.id===id); if(!s) throw new Error("Unknown skill");
+  const field = f => {
+    const req = f.required ? " *" : "";
+    if (f.kind==="textarea") return `<label>${esc(f.label)}${req}</label><textarea name="${f.name}" placeholder="${esc(f.placeholder)}"></textarea>`;
+    if (f.kind==="select") return `<label>${esc(f.label)}</label><select name="${f.name}">${f.options.map(o=>`<option>${esc(o)}</option>`).join("")}</select>`;
+    return `<label>${esc(f.label)}${req}</label><input name="${f.name}" placeholder="${esc(f.placeholder)}">`;
+  };
+  $("#view").innerHTML = `<a href="#create">← All skills</a><h1 style="margin-top:8px">${esc(s.title)}</h1><p class="sub">${esc(s.description)}</p>
+  <div class="grid g2"><form class="card" id="f">${s.fields.map(field).join("")}<div class="row" style="margin-top:16px"><button class="btn primary" id="go">Generate</button></div></form>
+  <div class="card" id="res"><div class="empty">Your result appears here.<br><small>${s.output==="post"?"Posts are saved to the approval queue.":s.output==="document"?"Documents are saved to your library.":""}</small></div></div></div>`;
+  $("#go").onclick = e => { e.preventDefault(); busy(e.target, async () => {
+    const inputs = Object.fromEntries(new FormData($("#f")).entries());
+    const r = await api("/api/skills/"+id, {method:"POST", body: inputs});
+    $("#res").innerHTML = `<div class="row"><b>Result</b><span class="spacer"></span>
+      <button class="btn sm" id="cp">Copy</button>
+      ${r.post_id?`<a class="btn sm primary" href="#queue">Review in queue →</a>`:""}
+      ${r.document_id && !DEMO?`<a class="btn sm" href="/api/documents/${r.document_id}/docx">Download .docx</a>`:""}</div>
+      <div class="out" style="margin-top:10px">${esc(r.output)}</div>`;
+    $("#cp").onclick = () => copy(r.post || r.output);
+  })};
+};
+
+/* ---------------- Queue ---------------- */
+function postCard(p, mode){
+  const date = (p.published_at||p.scheduled_at||p.created_at||"").replace("T"," ").slice(0,16);
+  return `<div class="post" data-id="${p.id}">
+    <div class="row"><span class="pill ${p.status}">${p.status}</span><span class="meta">#${p.id} · ${esc(p.target)}${p.pillar?" · "+esc(p.pillar):""}${p.hook_type?" · hook: "+esc(p.hook_type):""} · ${date}</span><span class="spacer"></span>
+    ${p.url?`<a class="btn sm" href="${p.url}" target="_blank">View on LinkedIn ↗</a>`:""}</div>
+    ${mode==="edit"?`<textarea class="ed">${esc(p.content)}</textarea>
+      <label>First comment</label><input class="fc" value="${esc(p.first_comment||"")}">
+      <div class="meta" style="margin-top:6px"><span class="cc">${p.content.length}</span> / 3000 characters · first ~210 show before "see more"</div>`
+    :`<div class="text">${esc(p.content)}</div>${p.first_comment?`<div class="meta">💬 First comment: ${esc(p.first_comment)}</div>`:""}`}
+    ${p.error?`<div class="banner bad" style="margin-top:8px">${esc(p.error)}</div>`:""}
+    <div class="row" style="margin-top:12px">${actions(p)}</div></div>`;
+}
+function actions(p){
+  if (p.status==="draft"||p.status==="failed") return `
+    <button class="btn ok sm" data-a="approve">✓ Approve</button>
+    <input type="datetime-local" class="when" style="width:auto">
+    <button class="btn sm" data-a="schedule">Schedule</button>
+    <button class="btn sm" data-a="save">Save edits</button>
+    <button class="btn sm" data-a="copy">Copy</button><span class="spacer"></span>
+    <button class="btn sm danger" data-a="reject">Reject</button>`;
+  if (p.status==="approved"||p.status==="scheduled") return `
+    <button class="btn primary sm" data-a="publish">🚀 Publish now</button>
+    <button class="btn sm" data-a="unapprove">Back to draft</button><button class="btn sm" data-a="copy">Copy</button>`;
+  return `<button class="btn sm" data-a="copy">Copy</button>`;
+}
+function wire(root, reload){
+  root.querySelectorAll(".post").forEach(el => {
+    const id = el.dataset.id, ed = el.querySelector(".ed"), fc = el.querySelector(".fc");
+    ed?.addEventListener("input", () => el.querySelector(".cc").textContent = ed.value.length);
+    el.querySelectorAll("[data-a]").forEach(b => b.onclick = () => busy(b, async () => {
+      const a = b.dataset.a;
+      if (a==="copy") return copy(ed ? ed.value : el.querySelector(".text").textContent);
+      if (a==="save") { await api(`/api/posts/${id}`,{method:"PATCH",body:{content:ed.value,first_comment:fc.value}}); toast("Saved"); }
+      if (a==="approve") { await api(`/api/posts/${id}/approve`,{method:"POST",body:{content:ed.value}}); await api(`/api/posts/${id}`,{method:"PATCH",body:{first_comment:fc.value}}); toast("Approved"); }
+      if (a==="schedule") { const w = el.querySelector(".when").value; if(!w) return toast("Pick a date & time first");
+        await api(`/api/posts/${id}/approve`,{method:"POST",body:{content:ed.value,scheduled_at:new Date(w).toISOString()}}); toast("Scheduled"); }
+      if (a==="reject") { await api(`/api/posts/${id}`,{method:"PATCH",body:{status:"rejected"}}); toast("Rejected"); }
+      if (a==="unapprove") { await api(`/api/posts/${id}`,{method:"PATCH",body:{status:"draft"}}); }
+      if (a==="publish") { if(!confirm("Publish this post to LinkedIn now?")) return; const r = await api(`/api/posts/${id}/publish`,{method:"POST"}); toast("Published 🎉"); if(r.url) window.open(r.url,"_blank"); }
+      reload();
+    }));
+  });
+}
+views.queue = async () => {
+  const [drafts, failed, approved, scheduled] = await Promise.all(["draft","failed","approved","scheduled"].map(s=>api("/api/posts?status="+s)));
+  const render = () => views.queue();
+  $("#view").innerHTML = `<div class="row"><div><h1>Approval queue</h1><p class="sub">Nothing is posted until you approve it.</p></div><span class="spacer"></span>
+    <a class="btn primary" href="#create/post_writer">+ New post</a></div>
+    <div class="cat">Needs review (${drafts.length+failed.length})</div><div class="grid" id="d">${[...failed,...drafts].map(p=>postCard(p,"edit")).join("")||`<div class="card empty">No drafts. Your daily draft will appear here.</div>`}</div>
+    <div class="cat">Ready to publish (${approved.length+scheduled.length})</div><div class="grid" id="a">${[...scheduled,...approved].map(p=>postCard(p)).join("")||`<div class="card empty">Approved posts appear here.</div>`}</div>`;
+  wire($("#view"), render);
+};
+
+/* ---------------- History ---------------- */
+views.history = async () => {
+  const rows = await api("/api/posts?status=published");
+  $("#view").innerHTML = `<div class="row"><div><h1>History & metrics</h1><p class="sub">LinkedIn's API doesn't share post analytics with self-serve apps. Copy the numbers from LinkedIn here so the agent can learn what works.</p></div><span class="spacer"></span><a class="btn" href="#create/weekly_report">Weekly report</a></div>
+  <div class="card">${rows.length?`<table><tr><th>Post</th><th>Date</th><th>Impr.</th><th>Reactions</th><th>Comments</th><th>Reposts</th><th></th></tr>
+  ${rows.map(p=>{const m=p.metrics||{};return `<tr data-id="${p.id}"><td>${esc(p.content.slice(0,70))}…</td><td>${(p.published_at||"").slice(0,10)}</td>
+    ${["impressions","reactions","comments","reposts"].map(k=>`<td><input type="number" min="0" data-k="${k}" value="${m[k]??""}" style="width:80px;padding:5px"></td>`).join("")}
+    <td><button class="btn sm" data-save>Save</button> ${p.url?`<a href="${p.url}" target="_blank">↗</a>`:""}</td></tr>`}).join("")}</table>`:`<div class="empty">No published posts yet.</div>`}</div>`;
+  document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>busy(b,async()=>{const tr=b.closest("tr");
+    const metrics=Object.fromEntries([...tr.querySelectorAll("input")].map(i=>[i.dataset.k,Number(i.value||0)]));
+    await api("/api/posts/"+tr.dataset.id,{method:"PATCH",body:{metrics}});toast("Metrics saved")}));
+};
+
+/* ---------------- Documents ---------------- */
+views.documents = async () => {
+  const docs = await api("/api/documents");
+  $("#view").innerHTML = `<div class="row"><div><h1>Documents</h1><p class="sub">Resumes, cover letters, profile rewrites and plans.</p></div><span class="spacer"></span>
+    <a class="btn" href="#create/resume_builder">+ Resume</a><a class="btn" href="#create/profile_optimizer">+ Profile rewrite</a></div>
+    <div class="grid">${docs.map(d=>`<details class="card"><summary class="row" style="cursor:pointer"><span class="pill">${esc(d.kind)}</span><b>${esc(d.title)}</b><span class="spacer"></span><span class="meta">${d.created_at.slice(0,10)}</span></summary>
+      <div class="row" style="margin:12px 0"><button class="btn sm" data-copy="${d.id}">Copy</button>${DEMO?"":`<a class="btn sm" href="/api/documents/${d.id}/docx">Download .docx</a>`}<button class="btn sm danger" data-del="${d.id}">Delete</button></div>
+      <div class="out">${esc(d.content)}</div></details>`).join("")||`<div class="card empty">No documents yet.</div>`}</div>`;
+  document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>copy(docs.find(d=>d.id==b.dataset.copy).content));
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>busy(b,async()=>{await api("/api/documents/"+b.dataset.del,{method:"DELETE"});views.documents()}));
+};
+
+/* ---------------- Stories ---------------- */
+views.stories = async () => {
+  const rows = await api("/api/stories");
+  $("#view").innerHTML = `<div class="row"><div><h1>Story bank</h1><p class="sub">Real experiences, numbers and opinions. The agent writes from these instead of inventing.</p></div><span class="spacer"></span><a class="btn" href="#create/interviewer">🎙 Interview me</a></div>
+  <div class="grid g2"><form class="card" id="sf"><label>Title</label><input name="title" placeholder="e.g. Lost our biggest client in 2023"><label>Story</label><textarea name="body" placeholder="What happened, numbers, what you learned"></textarea><label>Tags</label><input name="tags" placeholder="leadership, failure"><div class="row" style="margin-top:14px"><button class="btn primary" id="add">Add story</button></div></form>
+  <div class="grid">${rows.map(s=>`<div class="card"><div class="row"><b>${esc(s.title)}</b><span class="spacer"></span><button class="btn sm danger" data-del="${s.id}">✕</button></div><p style="margin:6px 0 0;white-space:pre-wrap">${esc(s.body)}</p>${s.tags?`<span class="pill">${esc(s.tags)}</span>`:""}</div>`).join("")||`<div class="card empty">No stories yet.</div>`}</div></div>`;
+  $("#add").onclick=e=>{e.preventDefault();busy(e.target,async()=>{await api("/api/stories",{method:"POST",body:Object.fromEntries(new FormData($("#sf")))});views.stories()})};
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>busy(b,async()=>{await api("/api/stories/"+b.dataset.del,{method:"DELETE"});views.stories()}));
+};
+
+/* ---------------- Network ---------------- */
+views.network = async () => {
+  const rows = await api("/api/contacts");
+  $("#view").innerHTML = `<div class="row"><div><h1>Network</h1><p class="sub">A tiny CRM for people you're building relationships with.</p></div><span class="spacer"></span><a class="btn" href="#create/connection_note">Write connection note</a><a class="btn" href="#create/dm_writer">Write DM</a></div>
+  <div class="grid g2"><form class="card" id="cf"><label>Name</label><input name="name"><label>Headline</label><input name="headline"><label>Profile URL</label><input name="url"><label>Notes</label><textarea name="notes"></textarea><label>Next follow-up</label><input type="date" name="next_follow_up"><div class="row" style="margin-top:14px"><button class="btn primary" id="add">Add contact</button></div></form>
+  <div class="card">${rows.length?`<table>${rows.map(c=>`<tr><td><b>${c.url?`<a href="${esc(c.url)}" target="_blank">${esc(c.name)}</a>`:esc(c.name)}</b><br><span class="meta">${esc(c.headline||"")}</span></td><td>${c.next_follow_up?`<span class="pill ${c.next_follow_up<=new Date().toISOString().slice(0,10)?"draft":""}">${esc(c.next_follow_up)}</span>`:""}</td><td><button class="btn sm danger" data-del="${c.id}">✕</button></td></tr>`).join("")}</table>`:`<div class="empty">No contacts yet.</div>`}</div></div>`;
+  $("#add").onclick=e=>{e.preventDefault();busy(e.target,async()=>{await api("/api/contacts",{method:"POST",body:Object.fromEntries(new FormData($("#cf")))});views.network()})};
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>busy(b,async()=>{await api("/api/contacts/"+b.dataset.del,{method:"DELETE"});views.network()}));
+};
+
+/* ---------------- Brand ---------------- */
+views.brand = async () => {
+  const {profile, fields} = await api("/api/brand");
+  const big = ["sample_posts","profile_text","audience","offer"];
+  $("#view").innerHTML = `<h1>Brand profile</h1><p class="sub">Every skill writes from this. The more specific, the less generic your posts.</p>
+  <form class="card" id="bf"><div class="grid g2">${fields.map(([k,l])=>`<div style="${big.includes(k)?"grid-column:1/-1":""}"><label>${esc(l)}</label>${big.includes(k)?`<textarea name="${k}">${esc(profile[k]||"")}</textarea>`:`<input name="${k}" value="${esc(profile[k]||"")}">`}</div>`).join("")}</div>
+  <div class="row" style="margin-top:16px"><button class="btn primary" id="sv">Save profile</button><a class="btn" href="#create/voice_builder">Build voice guide from samples</a></div></form>`;
+  $("#sv").onclick=e=>{e.preventDefault();busy(e.target,async()=>{await api("/api/brand",{method:"POST",body:Object.fromEntries(new FormData($("#bf")))});toast("Brand profile saved")})};
+};
+
+/* ---------------- Settings ---------------- */
+views.settings = async () => {
+  const [{config, presets}, li, sch] = await Promise.all([api("/api/llm"), api("/api/linkedin/status"), api("/api/schedule")]);
+  $("#view").innerHTML = `<h1>Settings</h1><p class="sub">Connect your LLM and LinkedIn. Keys and tokens are encrypted on your machine.</p>
+  <div class="grid g2">
+  <div class="card"><h3 style="margin-top:0">🤖 Language model</h3>
+    <form id="lf"><label>Provider</label><select name="provider" id="prov">${Object.keys(presets).map(p=>`<option ${p===config.provider?"selected":""}>${p}</option>`).join("")}</select>
+    <label>Model</label><input name="model" id="model" value="${esc(config.model)}">
+    <label>API base URL</label><input name="base_url" id="burl" value="${esc(config.base_url)}">
+    <label>API key ${config.api_key?`<span class="pill">saved ${esc(config.api_key)}</span>`:""}</label><input name="api_key" type="password" placeholder="${config.api_key?"leave blank to keep":"sk-…"}">
+    <label>Creativity (temperature)</label><input name="temperature" type="number" step="0.1" min="0" max="1.5" value="${config.temperature}">
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="ls">Save</button><button class="btn" id="lt">Test connection</button></div></form></div>
+  <div class="card"><h3 style="margin-top:0">🔗 LinkedIn</h3>
+    ${li.connected?`<p><span class="pill published">connected</span> as <b>${esc(li.member?.name||"")}</b> · token valid ~${li.expires_in_days} days</p>
+      <div class="row"><a class="btn" href="/auth/linkedin">Reconnect</a><button class="btn danger" id="dc">Disconnect</button></div>`
+     :`<p class="sub">Uses LinkedIn's official API (Sign In with LinkedIn + Share on LinkedIn). Set <code>LINKEDIN_CLIENT_ID</code> and <code>LINKEDIN_CLIENT_SECRET</code> first.</p><a class="btn primary" href="${DEMO?"#settings":"/auth/linkedin"}">Connect LinkedIn</a>`}
+    <h4>Company Pages</h4>
+    <p class="sub">${li.org_enabled?"Enabled.":"Requires LinkedIn's Community Management API approval, then set <code>LINKEDIN_ORG_ENABLED=1</code>."}</p>
+    ${li.org_enabled?`<button class="btn" id="orgs">Load my pages</button><div id="orgl"></div>`:""}
+    <h4>Profile editing</h4><p class="sub">LinkedIn has no API for editing profiles. Use <a href="#create/profile_optimizer">Profile Optimizer</a> and paste the copy in.</p></div>
+  <div class="card"><h3 style="margin-top:0">⏰ Daily schedule</h3><form id="scf">
+    <label class="check"><input type="checkbox" name="daily_draft_enabled" ${sch.daily_draft_enabled?"checked":""} style="width:auto"> Draft a post every day</label>
+    <label>Draft time</label><input type="time" name="daily_draft_time" value="${esc(sch.daily_draft_time)}">
+    <label>Timezone (IANA)</label><input name="timezone" value="${esc(sch.timezone)}" placeholder="Asia/Karachi">
+    <label class="check"><input type="checkbox" name="auto_publish" ${sch.auto_publish?"checked":""} style="width:auto"> Auto-publish the oldest <b>approved</b> post daily</label>
+    <label>Publish time</label><input type="time" name="publish_time" value="${esc(sch.publish_time)}">
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="ss">Save schedule</button></div></form></div>
+  <div class="card"><h3 style="margin-top:0">🧩 Use with Claude & other agents</h3>
+    <p class="sub">Run <code>linkedin-agent mcp</code> to expose these tools over MCP, or install the Claude skill from the repo's <code>skill/</code> folder.</p>
+    <div class="out">{"mcpServers":{"linkedin-agent":{"command":"linkedin-agent","args":["mcp"]}}}</div></div>
+  </div>`;
+  const prov=$("#prov"); prov.onchange=()=>{const p=presets[prov.value];$("#model").value=p.model;$("#burl").value=p.base_url};
+  $("#ls").onclick=e=>{e.preventDefault();busy(e.target,async()=>{await api("/api/llm",{method:"POST",body:Object.fromEntries(new FormData($("#lf")))});toast("LLM saved");views.settings()})};
+  $("#lt").onclick=e=>{e.preventDefault();busy(e.target,async()=>{const r=await api("/api/llm/test",{method:"POST"});toast("✅ Model replied: "+r.reply)})};
+  $("#ss").onclick=e=>{e.preventDefault();busy(e.target,async()=>{const f=$("#scf");await api("/api/schedule",{method:"POST",body:{
+    daily_draft_enabled:f.daily_draft_enabled.checked,daily_draft_time:f.daily_draft_time.value,timezone:f.timezone.value,auto_publish:f.auto_publish.checked,publish_time:f.publish_time.value}});toast("Schedule saved")})};
+  $("#dc")?.addEventListener("click",e=>busy(e.target,async()=>{await api("/api/linkedin/disconnect",{method:"POST"});views.settings()}));
+  $("#orgs")?.addEventListener("click",e=>busy(e.target,async()=>{const o=await api("/api/linkedin/organizations");$("#orgl").innerHTML=o.map(x=>`<div class="pill">${esc(x.urn)}</div>`).join(" ")||"No pages found"}));
+};
+
+route();
+api("/api/health").then(h=>$("#foot").textContent="v"+h.version+(DEMO?" · demo":"")).catch(()=>{});
+</script>
+</body>
+</html>
