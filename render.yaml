@@ -1,0 +1,19 @@
+# One-click deploy to Render: https://render.com/deploy?repo=https://github.com/jrnoorbaloch/linkedin-agent
+services:
+  - type: web
+    name: linkedin-agent
+    runtime: docker
+    plan: starter
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: LA_API_TOKEN
+        generateValue: true
+      - key: LA_BASE_URL
+        sync: false
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false

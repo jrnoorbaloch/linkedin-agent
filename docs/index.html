@@ -1,109 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LinkedIn Agent — open-source AI agent for LinkedIn posts, profile &amp; resume</title>
-<meta name="description" content="Open-source AI agent for LinkedIn: daily posts, profile optimization, resumes and approval-gated publishing — bring your own LLM.">
-<meta name="keywords" content="LinkedIn agent, LinkedIn AI, LinkedIn automation, AI LinkedIn post generator, LinkedIn profile optimizer, resume builder, MCP server, Claude skill, open source">
-<meta name="author" content="jrnoorbaloch">
-<meta name="robots" content="index,follow">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinkedIn Agent: open-source AI agent for LinkedIn posts, profile &amp; resume</title>
+<meta name="description" content="Open-source AI agent for LinkedIn. Drafts a post every morning, rewrites your profile, builds your resume and publishes through LinkedIn&#x27;s official API after you approve. Any LLM. Desktop, web, Docker, MCP and Claude skill.">
+<meta name="keywords" content="LinkedIn AI agent, LinkedIn automation, AI LinkedIn post generator, LinkedIn post scheduler, LinkedIn profile optimizer, AI resume builder, LinkedIn content calendar, MCP server, Claude skill, open source, self-hosted">
+<meta name="author" content="jrnoorbaloch"><meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://jrnoorbaloch.github.io/linkedin-agent/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="LinkedIn Agent">
-<meta property="og:title" content="LinkedIn Agent — open-source AI agent for LinkedIn posts, profile &amp; resume">
-<meta property="og:description" content="Open-source AI agent for LinkedIn: daily posts, profile optimization, resumes and approval-gated publishing — bring your own LLM.">
-<meta property="og:url" content="https://jrnoorbaloch.github.io/linkedin-agent/">
-<meta property="og:image" content="https://jrnoorbaloch.github.io/linkedin-agent/assets/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="LinkedIn Agent — open-source AI agent for LinkedIn posts, profile &amp; resume">
-<meta name="twitter:description" content="Open-source AI agent for LinkedIn: daily posts, profile optimization, resumes and approval-gated publishing — bring your own LLM.">
-<meta name="twitter:image" content="https://jrnoorbaloch.github.io/linkedin-agent/assets/og.png">
-<meta name="theme-color" content="#0a66c2">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website"><meta property="og:site_name" content="LinkedIn Agent"><meta property="og:title" content="LinkedIn Agent: open-source AI agent for LinkedIn posts, profile &amp; resume">
+<meta property="og:description" content="Open-source AI agent for LinkedIn. Drafts a post every morning, rewrites your profile, builds your resume and publishes through LinkedIn&#x27;s official API after you approve. Any LLM. Desktop, web, Docker, MCP and Claude skill."><meta property="og:url" content="https://jrnoorbaloch.github.io/linkedin-agent/"><meta property="og:image" content="https://jrnoorbaloch.github.io/linkedin-agent/assets/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="LinkedIn Agent: open-source AI agent for LinkedIn posts, profile &amp; resume"><meta name="twitter:description" content="Open-source AI agent for LinkedIn. Drafts a post every morning, rewrites your profile, builds your resume and publishes through LinkedIn&#x27;s official API after you approve. Any LLM. Desktop, web, Docker, MCP and Claude skill."><meta name="twitter:image" content="https://jrnoorbaloch.github.io/linkedin-agent/assets/og.png">
+<meta name="theme-color" content="#0f1b33">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="assets/app-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fbfaf8;--panel:#fff;--ink:#16191c;--muted:#5b636c;--line:#e7e4de;--brand:#0a66c2;--brand-2:#004182;--soft:#eaf2fb;--code:#f3f1ec;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1113;--panel:#171a1d;--ink:#e9ebee;--muted:#9ba4ad;--line:#2a2f34;--brand:#5aa8ee;--brand-2:#8cc2f5;--soft:#14253a;--code:#1d2125}}
+:root{--ink:#0f1b33;--ink2:#17264a;--paper:#f6f7fb;--surface:#fff;--line:#e3e7f0;--text:#101828;--muted:#5b6782;--faint:#8a95ad;
+--brand:#3b5bfd;--brand2:#2c47d9;--soft:#eef1ff;--ok:#12a150;--oksoft:#e7f7ee;--warn:#c97a00;--warnsoft:#fff4dc;--mint:#a5f3c5;
+--display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;--body:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;font-size:16px}
-a{color:var(--brand)}
-header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.bar{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:12px 22px}
-.brand{display:flex;gap:9px;align-items:center;font-weight:750;color:var(--ink);text-decoration:none}
-.brand b{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:#0a66c2;color:#fff;font-size:12px}
-.bar nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
-.bar nav a{color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:14.5px;font-weight:500}
-.bar nav a:hover,.bar nav a.on{color:var(--ink);background:var(--code)}
-.gh{font-size:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:999px;color:var(--ink)}
-main{max-width:1120px;margin:0 auto;padding:40px 22px 80px}
-.doc{max-width:820px}
-h1{font-size:clamp(30px,4.6vw,52px);line-height:1.1;letter-spacing:-.02em;margin:.2em 0 .35em}
-h2{font-size:26px;letter-spacing:-.01em;margin:2em 0 .5em;padding-top:.3em}
-h3{font-size:18px;margin:1.6em 0 .4em}
-.lead{font-size:19px;color:var(--muted);max-width:720px}
-.cta{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0}
-.btn{display:inline-block;padding:11px 20px;border-radius:999px;font-weight:650;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--panel)}
-.btn.p{background:#0a66c2;border-color:#0a66c2;color:#fff}
-.btn:hover{filter:brightness(1.05)}
-.shot{border-radius:14px;border:1px solid var(--line);box-shadow:0 20px 50px -20px rgba(0,0,0,.25);width:100%;height:auto;display:block;margin:18px 0}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 14px}
-.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:14.5px}
-.ico{font-size:22px}
-code{background:var(--code);padding:.1em .38em;border-radius:5px;font-size:.9em}
-pre{background:var(--code);padding:16px 18px;border-radius:12px;overflow:auto;font-size:14px;line-height:1.5;border:1px solid var(--line)}
-pre code{background:none;padding:0}
-table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-.note{background:var(--soft);border-left:3px solid var(--brand);padding:12px 16px;border-radius:8px;margin:16px 0}
-.tag{display:inline-block;font-size:12px;font-weight:600;background:var(--code);padding:2px 9px;border-radius:999px;color:var(--muted);margin:2px}
-.yes{color:#0b7a46;font-weight:700}.no{color:#b42318;font-weight:700}
-.arch{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
-.arch div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-weight:600}
-.arch small{display:block;font-weight:400;color:var(--muted)}
-.core{grid-column:1/-1;background:var(--soft)!important;border-color:var(--brand)!important}
-footer{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
-footer .bar{flex-wrap:wrap}
-iframe.demo{width:100%;height:760px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
-@media(max-width:760px){.bar nav{display:none}.arch{grid-template-columns:1fr}iframe.demo{height:620px}}
+body{margin:0;background:var(--paper);color:var(--text);font:16.5px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}img{max-width:100%;height:auto}
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+header.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.nav .wrap{display:flex;align-items:center;gap:28px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font:700 18px var(--display);color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.logo img{width:30px;height:30px;border-radius:8px}
+header.nav nav{display:flex;gap:4px;flex:1}
+header.nav nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:15px;padding:7px 12px;border-radius:9px}
+header.nav nav a:hover,header.nav nav a.on{color:var(--text);background:var(--surface)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:11px 18px;font-weight:700;font-size:15px;text-decoration:none;border:1px solid var(--line);color:var(--text);background:var(--surface);white-space:nowrap}
+.btn:hover{border-color:var(--faint)}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}.btn.p:hover{background:var(--brand2)}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.sm{padding:7px 13px;font-size:14px;border-radius:9px}
+.btn svg{width:18px;height:18px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.08;margin:0}
+.lead{font-size:20px;color:var(--muted);max-width:640px;line-height:1.55}
+section{padding:96px 0}
+.sec-h{max-width:720px;margin-bottom:44px}.sec-h h2{font-size:clamp(32px,4vw,48px)}.sec-h p{color:var(--muted);font-size:18.5px;margin:14px 0 0}
+/* hero */
+.hero{padding:72px 0 40px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(42px,5.4vw,70px);font-weight:800;letter-spacing:-.035em;line-height:.98}
+.hero .lead{margin:26px 0 30px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;color:var(--muted);font-size:14.5px}
+.trust span{display:inline-flex;gap:7px;align-items:center}.trust svg{width:16px;height:16px;color:var(--ok)}
+/* signature: the post that moves through the pipeline */
+.stage{position:relative;height:500px}
+.post{position:absolute;inset:40px 30px auto 0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 30px 70px -30px rgba(15,27,51,.35);font:14.5px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.post .h{display:flex;gap:11px;align-items:center;margin-bottom:12px}
+.post .av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3b5bfd,#7c4dff);display:grid;place-items:center;color:#fff;font-weight:700}
+.post .n{font-weight:700}.post .s{font-size:12.5px;color:var(--muted)}
+.post .fold{border-top:1.5px dashed var(--warn);position:relative;margin:6px 0}
+.post .fold span{position:absolute;right:0;top:-10px;background:#fff;color:var(--warn);font:700 11px var(--body);padding:0 6px}
+.post .rest{opacity:.5}
+.post .bar{display:flex;justify-content:space-around;border-top:1px solid var(--line);margin-top:12px;padding-top:9px;color:var(--muted);font-size:13px;font-weight:600}
+.pipe{position:absolute;left:0;right:30px;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pipe div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.pipe b{display:block;color:var(--text);font-size:14px}
+.pipe div.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--soft)}
+.stamp{position:absolute;right:6px;top:8px;font:800 15px var(--display);padding:8px 14px;border-radius:10px;transform:rotate(6deg);border:2.5px solid;background:var(--surface);opacity:0}
+.stamp.draft{color:var(--warn);border-color:var(--warn)}.stamp.ok{color:var(--brand);border-color:var(--brand)}.stamp.live{color:var(--ok);border-color:var(--ok)}
+@media (prefers-reduced-motion:no-preference){
+ .stamp.draft{animation:s1 9s infinite}.stamp.ok{animation:s2 9s infinite}.stamp.live{animation:s3 9s infinite}
+ .pipe div:nth-child(1){animation:p1 9s infinite}.pipe div:nth-child(2){animation:p2 9s infinite}.pipe div:nth-child(3){animation:p3 9s infinite}.pipe div:nth-child(4){animation:p4 9s infinite}
+}
+@keyframes s1{0%,30%{opacity:1;transform:rotate(6deg) scale(1)}33%,100%{opacity:0}}
+@keyframes s2{0%,33%{opacity:0}36%{opacity:1;transform:rotate(6deg) scale(1.15)}38%,63%{opacity:1;transform:rotate(6deg) scale(1)}66%,100%{opacity:0}}
+@keyframes s3{0%,66%{opacity:0}69%{opacity:1;transform:rotate(6deg) scale(1.15)}71%,100%{opacity:1;transform:rotate(6deg) scale(1)}}
+@keyframes p1{0%,24%{border-color:var(--brand);box-shadow:0 0 0 3px var(--soft)}25%,100%{border-color:var(--line);box-shadow:none}}
+@keyframes p2{0%,24%,50%,100%{border-color:var(--line);box-shadow:none}25%,49%{border-color:var(--brand);box-shadow:0 0 0 3px var(--soft)}}
+@keyframes p3{0%,49%,75%,100%{border-color:var(--line);box-shadow:none}50%,74%{border-color:var(--brand);box-shadow:0 0 0 3px var(--soft)}}
+@keyframes p4{0%,74%{border-color:var(--line);box-shadow:none}75%,100%{border-color:var(--ok);box-shadow:0 0 0 3px var(--oksoft)}}
+/* product shot */
+.frame{border-radius:18px;background:var(--ink);padding:10px;box-shadow:0 50px 100px -40px rgba(15,27,51,.5)}
+.frame .dots{display:flex;gap:6px;padding:4px 6px 10px}.frame .dots i{width:10px;height:10px;border-radius:50%;background:#2b3b63}
+.frame img{display:block;border-radius:10px;width:100%}
+.works{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;color:var(--muted);font-weight:600;padding:30px 0 0}
+.works b{color:var(--text);font-family:var(--display);font-size:17px}
+/* day timeline */
+.day{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:2px solid var(--ink)}
+.day>div{padding:22px 22px 0 0}
+.day time{display:block;font:800 30px var(--display);letter-spacing:-.02em}
+.day h3{font-size:19px;margin:8px 0 6px}.day p{margin:0;color:var(--muted);font-size:15.5px}
+/* tabs gallery */
+.gal-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.gal-tabs button{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:600 14.5px var(--body);padding:8px 14px;border-radius:999px;cursor:pointer}
+.gal-tabs button[aria-selected=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.gal-cap{color:var(--muted);margin:16px 0 0;max-width:760px}
+/* feature list: two columns of rows, not cards */
+.flist{display:grid;grid-template-columns:repeat(2,1fr);gap:0 56px}
+.flist>div{display:grid;grid-template-columns:40px 1fr;gap:14px;padding:22px 0;border-top:1px solid var(--line)}
+.flist .ic{width:40px;height:40px;border-radius:11px;background:var(--soft);color:var(--brand);display:grid;place-items:center}
+.flist .ic svg{width:20px;height:20px}
+.flist h3{font-size:18px;margin:2px 0 4px}.flist p{margin:0;color:var(--muted);font-size:15.5px}
+/* personas */
+.ppl{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.ppl a{display:block;text-decoration:none;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.ppl a:hover{border-color:var(--brand)}
+.ppl .e{font-size:30px}.ppl h3{font-size:19px;margin:10px 0 6px}.ppl p{margin:0;color:var(--muted);font-size:14.5px}
+/* run-it-your-way */
+.ways{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface)}
+.ways>div{padding:24px;border-left:1px solid var(--line)}.ways>div:first-child{border:0}
+.ways h3{font-size:20px;margin-bottom:6px}.ways p{color:var(--muted);font-size:15px;margin:0 0 16px}
+code{background:#eceff6;padding:.12em .4em;border-radius:6px;font-size:.88em}
+pre{background:var(--ink);color:#e6ebf7;padding:18px 20px;border-radius:14px;overflow:auto;font-size:14px;line-height:1.55}
+pre code{background:none;padding:0;color:inherit}
+/* api honesty table */
+table{width:100%;border-collapse:collapse;font-size:15.5px}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13.5px;color:var(--muted);font-weight:600}
+.yes{color:var(--ok);font-weight:700}.no{color:#b42318;font-weight:700}.maybe{color:var(--warn);font-weight:700}
+.dark-band{background:var(--ink);color:#e6ebf7}.dark-band .sec-h p,.dark-band p{color:#aab6d3}
+.dark-band h2{color:#fff}
+.final{text-align:center}.final h2{font-size:clamp(36px,5vw,60px);color:#fff}.final p{font-size:19px;margin:16px auto 30px;max-width:600px}
+footer{border-top:1px solid var(--line);padding:40px 0 60px;color:var(--muted);font-size:14.5px}
+footer .wrap{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:30px}
+footer h4{margin:0 0 10px;color:var(--text);font-size:14px}footer a{display:block;color:var(--muted);text-decoration:none;padding:3px 0}footer a:hover{color:var(--text)}
+/* docs layout */
+.docs{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;padding:40px 24px 80px;max-width:1180px;margin:0 auto}
+.docs aside{position:sticky;top:84px;align-self:start;max-height:calc(100vh - 100px);overflow:auto}
+.docs aside h5{font-size:13px;color:var(--faint);margin:18px 0 6px;font-weight:600}
+.docs aside a{display:block;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;font-weight:500;font-size:15px}
+.docs aside a:hover{color:var(--text)}.docs aside a.on{background:var(--soft);color:var(--brand);font-weight:700}
+.prose{max-width:760px}
+.prose h1{font-size:44px;margin-bottom:10px}
+.prose h2{font-size:27px;margin:48px 0 12px;padding-top:6px}
+.prose h3{font-size:19px;margin:28px 0 8px}
+.prose p,.prose li{color:#2c3650}
+.prose .lead{margin-bottom:12px}
+.note{background:var(--soft);border-left:3px solid var(--brand);padding:14px 18px;border-radius:10px;margin:18px 0}
+.warn{background:var(--warnsoft);border-left-color:var(--warn)}
+.shot{border-radius:14px;border:1px solid var(--line);display:block;margin:18px 0;box-shadow:0 24px 50px -30px rgba(15,27,51,.35)}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.screens figure{margin:0 0 54px}.screens figcaption{margin-top:10px;color:var(--muted)}.screens figcaption b{color:var(--text);font-family:var(--display);font-size:20px;display:block}
+.dlrow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.dl{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.dl.rec{border-color:var(--brand);box-shadow:0 0 0 4px var(--soft)}
+.dl h3{font-size:21px}.dl p{color:var(--muted);font-size:15px}
+.tag{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--soft);color:var(--brand)}
+@media (max-width:980px){.hero-grid,.flist,.grid2{grid-template-columns:1fr}.stage{height:520px}.day,.ways,.ppl,.dlrow{grid-template-columns:repeat(2,1fr)}.ways>div:nth-child(3){border-left:0}
+ footer .wrap{grid-template-columns:1fr 1fr}.docs{grid-template-columns:1fr}.docs aside{position:static;max-height:none}}
+@media (max-width:640px){header.nav nav{display:none}.day,.ways,.ppl,.dlrow{grid-template-columns:1fr}.ways>div{border-left:0;border-top:1px solid var(--line)}section{padding:64px 0}.post{inset:20px 0 auto 0}.pipe{right:0}}
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "LinkedIn Agent", "applicationCategory": "BusinessApplication", "operatingSystem": "Windows, macOS, Linux, Docker", "description": "Open-source AI agent for LinkedIn: daily posts, profile optimization, resumes and approval-gated publishing \u2014 bring your own LLM.", "url": "https://jrnoorbaloch.github.io/linkedin-agent/", "license": "https://opensource.org/licenses/MIT", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "softwareVersion": "0.1.0", "codeRepository": "https://github.com/jrnoorbaloch/linkedin-agent"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "LinkedIn Agent", "applicationCategory": "BusinessApplication", "operatingSystem": "Windows, macOS, Linux, Docker", "description": "Open-source AI agent for LinkedIn. Drafts a post every morning, rewrites your profile, builds your resume and publishes through LinkedIn's official API after you approve. Any LLM. Desktop, web, Docker, MCP and Claude skill.", "url": "https://jrnoorbaloch.github.io/linkedin-agent/", "softwareVersion": "2.0.0", "license": "https://opensource.org/licenses/MIT", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "downloadUrl": "https://jrnoorbaloch.github.io/linkedin-agent/download.html", "screenshot": "https://jrnoorbaloch.github.io/linkedin-agent/assets/screens/dashboard.png", "codeRepository": "https://github.com/jrnoorbaloch/linkedin-agent"}</script>
 </head>
 <body>
-<header><div class="bar"><a class="brand" href="index.html"><b>LA</b>LinkedIn Agent</a><nav><a href="index.html" class="on">Home</a><a href="getting-started.html" class="">Get started</a><a href="portal.html" class="">Web portal</a><a href="skills.html" class="">Skills</a><a href="claude.html" class="">Claude & MCP</a><a href="api.html" class="">API</a><a href="faq.html" class="">FAQ</a></nav><a class="gh" href="https://github.com/jrnoorbaloch/linkedin-agent">★ GitHub</a></div></header>
-<main><div class="">
+<header class="nav"><div class="wrap"><a class="logo" href="index.html"><img src="assets/app-icon.png" alt="" width="30" height="30">LinkedIn Agent</a>
+<nav aria-label="Main"><a href="features.html" class="">Features</a><a href="screens.html" class="">Screens</a><a href="personas.html" class="">For you</a><a href="docs.html" class="">Docs</a><a href="download.html" class="">Download</a></nav>
+<a class="btn sm" href="https://github.com/jrnoorbaloch/linkedin-agent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.6 16 2.5a13.4 13.4 0 0 0-7 0C6.3.6 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/></svg> GitHub</a><a class="btn sm p" href="download.html">Download</a></div></header>
 
-<p class="tag">Open source · Self-hosted · v0.1.0</p>
-<h1>Your LinkedIn, on autopilot. With you in control.</h1>
-<p class="lead">LinkedIn Agent drafts a post every day, rewrites your profile, builds your resume and publishes through LinkedIn's official API, using <b>any LLM you choose</b>. Run it as a web portal, an MCP server, or a Claude skill.</p>
-<div class="cta"><a class="btn p" href="getting-started.html">Get started in 5 minutes →</a><a class="btn" href="demo/">Try the live UI demo</a><a class="btn" href="https://github.com/jrnoorbaloch/linkedin-agent">View on GitHub</a></div>
-<img class="shot" src="assets/ui-dashboard.png" alt="LinkedIn Agent web portal dashboard showing drafts, published posts, engagement rate and setup checklist" width="2040" height="1290">
-<h2>Everything LinkedIn, in one agent</h2>
-<p>28 skills across 7 areas: <span class="tag">✍️ Content · 9</span> <span class="tag">💬 Engagement · 2</span> <span class="tag">🤝 Networking · 3</span> <span class="tag">🎯 Profile · 3</span> <span class="tag">💼 Career · 6</span> <span class="tag">🏢 Company Page · 3</span> <span class="tag">📈 Analytics · 2</span></p>
-<div class="grid"><div class="card"><div class="ico">🗓️</div><h3>A post every morning</h3><p>The scheduler drafts today's post from your pillars and Story Bank. You approve; it publishes.</p></div><div class="card"><div class="ico">🔌</div><h3>Any LLM</h3><p>OpenAI, Claude, Gemini, Groq, OpenRouter, DeepSeek or a local Ollama model. Your key, your machine.</p></div><div class="card"><div class="ico">✅</div><h3>Approval-gated</h3><p>Nothing is posted without your OK, enforced in the API, the MCP server and the Claude skill.</p></div><div class="card"><div class="ico">🎯</div><h3>Profile optimizer</h3><p>Headline, About, Experience, Skills, Featured and banner rewrites ready to paste.</p></div><div class="card"><div class="ico">📄</div><h3>Resumes & cover letters</h3><p>ATS-friendly resumes tailored to a job description, exported to Word.</p></div><div class="card"><div class="ico">🧩</div><h3>Claude skill + MCP</h3><p>Use it from Claude, Claude Code, Cursor or any MCP client. Or just the web portal.</p></div><div class="card"><div class="ico">🏢</div><h3>Company Pages</h3><p>Page posts, hiring posts and employee-advocacy packs (with LinkedIn's Community Management API).</p></div><div class="card"><div class="ico">🔒</div><h3>Self-hosted & private</h3><p>SQLite on your machine, API keys and tokens encrypted at rest. MIT licensed.</p></div></div>
-<h2>How it fits together</h2>
-<div class="arch">
- <div>🖥️ Web portal<small>for you, in the browser</small></div>
- <div>🧩 MCP server<small>for Claude, Cursor, any agent</small></div>
- <div>📚 Claude skill<small>playbooks + workflows</small></div>
- <div class="core">⚙️ Core engine: skill registry · your LLM · approval queue · scheduler · LinkedIn API · encrypted SQLite</div>
+<main>
+<div class="hero"><div class="wrap hero-grid">
+ <div>
+  <h1>Your LinkedIn, written for you. Posted only when you say so.</h1>
+  <p class="lead">LinkedIn Agent drafts a post every morning in your voice, rewrites your profile, builds your resume and publishes through LinkedIn's official API once you approve. Use any AI model. Free and open source.</p>
+  <div class="cta"><a class="btn p" href="download.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg> Download for free</a><a class="btn" href="demo/">Try the live demo</a></div>
+  <div class="trust"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Official LinkedIn API</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Runs on your computer</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> No account to create</span></div>
+ </div>
+ <div class="stage" aria-label="A post moving from draft to approved to published">
+  <div class="post"><div class="h"><div class="av">A</div><div><div class="n">Ayesha Khan</div><div class="s">Head of Growth · B2B SaaS</div></div></div>
+   <div>We ran 41 onboarding experiments last quarter.<br><br>38 failed.<br><br>The 3 that worked had one thing in common: they removed a step instead of adding a feature.</div>
+   <div class="fold"><span>…see more</span></div><div class="rest">→ Killed the “invite your team” screen (+18% activation)<br>→ Pre-filled the first project (+11%)</div>
+   <div class="bar"><span>👍 Like</span><span>💬 Comment</span><span>🔁 Repost</span></div>
+   <span class="stamp draft">Draft</span><span class="stamp ok">Approved</span><span class="stamp live">Published</span></div>
+  <div class="pipe"><div><b>08:00</b>Drafted</div><div><b>08:06</b>Approved on phone</div><div><b>09:30</b>Scheduled</div><div><b>09:30</b>Live on LinkedIn</div></div>
+ </div>
 </div>
-<h2>Install</h2>
-<pre><code>pip install git+https://github.com/jrnoorbaloch/linkedin-agent
-linkedin-agent serve        # open http://localhost:8787</code></pre>
-<p>or with Docker: <code>docker compose up -d</code>. Full guide: <a href="getting-started.html">Getting started</a>.</p>
-<h2>Honest about LinkedIn's API</h2>
-<table><tr><th>Capability</th><th>Status</th><th>How</th></tr>
-<tr><td>Post as yourself</td><td class="yes">Yes</td><td>Self-serve "Share on LinkedIn" (<code>w_member_social</code>)</td></tr>
-<tr><td>First comment on your post</td><td class="yes">Yes</td><td>Same permission</td></tr>
-<tr><td>Post as a Company Page</td><td class="yes">With approval</td><td>Community Management API (<code>w_organization_social</code>)</td></tr>
-<tr><td>Edit your profile</td><td class="no">No API</td><td>Agent writes the copy, you paste it</td></tr>
-<tr><td>Read post analytics</td><td class="no">Restricted</td><td>Paste metrics in History; the agent learns from them</td></tr>
-<tr><td>DMs / connection requests</td><td class="no">No API</td><td>Agent drafts, you send</td></tr></table>
-<p>No scraping, no browser bots, no account risk. <a href="faq.html">Read the FAQ</a>.</p>
+<div class="wrap"><div class="frame" style="margin-top:56px"><div class="dots"><i></i><i></i><i></i></div><img src="assets/screens/dashboard.png" alt="LinkedIn Agent dashboard with today's draft in a LinkedIn-style preview, stats and best posting times" width="2160" height="1350"></div>
+<div class="works"><span>Works with</span><b>OpenAI</b><b>Claude</b><b>Gemini</b><b>Groq</b><b>OpenRouter</b><b>DeepSeek</b><b>Ollama</b><span>and any OpenAI-compatible API</span></div></div>
+</div>
 
-</div></main>
-<footer><div class="bar"><span>LinkedIn Agent v0.1.0 · MIT License · Not affiliated with LinkedIn Corporation.</span><span style="flex:1"></span><a href="https://github.com/jrnoorbaloch/linkedin-agent">GitHub</a><a href="https://github.com/jrnoorbaloch/linkedin-agent/issues">Issues</a><a href="sitemap.xml">Sitemap</a></div></footer>
-</body>
-</html>
+<section><div class="wrap">
+ <div class="sec-h"><h2>What a day looks like</h2><p>Set it up once. After that, your part takes about a minute.</p></div>
+ <div class="day">
+  <div><time>08:00</time><h3>A draft is waiting</h3><p>Written from your pillars, your real stories and today's headlines in your field.</p></div>
+  <div><time>08:06</time><h3>You approve it</h3><p>In the app, or straight from Telegram or WhatsApp. Edit first if you like.</p></div>
+  <div><time>09:30</time><h3>It goes live</h3><p>Published at your best time, with the first comment added for you.</p></div>
+  <div><time>Fri</time><h3>You see what worked</h3><p>Import LinkedIn's analytics and get a weekly report with next week's plan.</p></div>
+ </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+ <div class="sec-h"><h2>See every screen</h2><p>A desktop app, a web portal, the same modern interface. Light and dark, five languages.</p></div>
+ <div class="gal-tabs" role="tablist"><button role="tab" aria-selected="true" data-shot="dashboard" data-cap="Today&#x27;s draft in a real LinkedIn preview, the dashed line where “see more” cuts in, what&#x27;s scheduled next, your best posting slots and a setup checklist.">Dashboard</button><button role="tab" aria-selected="false" data-shot="queue" data-cap="A board with Drafts, Approved, Scheduled and Published. Nothing reaches LinkedIn until someone approves it.">Approval queue</button><button role="tab" aria-selected="false" data-shot="editor" data-cap="Edit with a live preview and a character count, attach an image or PDF carousel, schedule, or copy a review link for a client.">Post editor</button><button role="tab" aria-selected="false" data-shot="calendar" data-cap="Month view of scheduled and published posts. Drag a post to another day to move it.">Calendar</button><button role="tab" aria-selected="false" data-shot="analytics" data-cap="Impressions by week, an engagement heatmap by weekday and hour, and results by hook formula and pillar.">Analytics</button><button role="tab" aria-selected="false" data-shot="media" data-cap="Generate images with your own image model, upload your own, and turn carousel text into a branded PDF.">Media studio</button><button role="tab" aria-selected="false" data-shot="packs" data-cap="Eight ready-made setups: students, job seekers, developers, freelancers, sales, founders, experts and recruiters.">Persona packs</button><button role="tab" aria-selected="false" data-shot="integrations" data-cap="Approve drafts from Telegram or WhatsApp, post updates to Slack, send webhooks to Zapier, subscribe in Google Calendar.">Notifications &amp; integrations</button></div>
+ <div class="frame"><div class="dots"><i></i><i></i><i></i></div><img id="galimg" src="assets/screens/dashboard.png" alt="Dashboard screen" width="2160" height="1350"></div>
+ <p class="gal-cap" id="galcap">Today&#x27;s draft in a real LinkedIn preview, the dashed line where “see more” cuts in, what&#x27;s scheduled next, your best posting slots and a setup checklist.</p>
+ <p><a href="screens.html">All 22 screens</a></p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+ <div class="sec-h"><h2>Everything you do on LinkedIn, in one place</h2><p>39 skills across content, engagement, networking, your profile, your career and your company page.</p></div>
+ <div class="flist">
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg></span><div><h3>Posts that sound like you</h3><p>20 proven hook formulas, a humanizer that strips AI tells, and a preview that shows exactly where LinkedIn cuts to “see more”.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><div><h3>Nothing posts without approval</h3><p>Enforced in the app, the API and the MCP server. Share a review link with a client who doesn't have an account.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg></span><div><h3>Set up in one drop</h3><p>Import LinkedIn's own data export. Your profile, experience, skills and past posts become your brand profile and voice.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4"/></svg></span><div><h3>Images and carousels</h3><p>Generate images with your own model and turn any outline into a branded PDF carousel, posted as a document.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 2h10v20H7zM11 18h2"/></svg></span><div><h3>Approve from your phone</h3><p>Drafts arrive in Telegram with Approve and Reject buttons, or on WhatsApp where you reply APPROVE.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4"/></svg></span><div><h3>Calendar and scheduling</h3><p>Drag posts between days and subscribe in Google Calendar. The scheduler posts at your best times.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l5 5v13H6zM14 3v6h6"/></svg></span><div><h3>Profile, resume and job search</h3><p>Headline A/B lab, full profile rewrite, ATS resume with Word export, cover letters, job match and interview prep.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM22 19v-1a4 4 0 0 0-3-3.9"/></svg></span><div><h3>Teams, clients and Company Pages</h3><p>A workspace per account, roles for writers and reviewers, and Company Page posting once LinkedIn approves your app.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><div><h3>Know your best time to post</h3><p>An engagement heatmap by weekday and hour, plus what's working by hook formula and pillar.</p></div></div>
+  <div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"/></svg></span><div><h3>Built for AI agents too</h3><p>An MCP server for Claude, Cursor and any agent, a Claude skill with every playbook, and a REST API.</p></div></div>
+ </div>
+ <p style="margin-top:26px"><a href="features.html">All features</a> · <a href="skills.html">All 39 skills</a></p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+ <div class="sec-h"><h2>Made for whoever you are</h2><p>Pick a persona pack and the agent starts with the right pillars, skills and trend feeds.</p></div>
+ <div class="ppl"><a href="personas.html#student"><span class="e">🎓</span><h3>Students &amp; Freshers</h3><p>Land internships and your first job by documenting what you learn and build.</p></a><a href="personas.html#job_seeker"><span class="e">💼</span><h3>Job Seekers</h3><p>Get referrals and recruiter messages with a sharp profile and proof-of-work posts.</p></a><a href="personas.html#developer"><span class="e">💻</span><h3>Developers &amp; Engineers</h3><p>Turn your code, repos and debugging stories into authority content.</p></a><a href="personas.html#freelancer"><span class="e">🧑‍💻</span><h3>Freelancers &amp; Agencies</h3><p>Attract clients with case studies, process posts and a profile that sells.</p></a><a href="personas.html#sales"><span class="e">📈</span><h3>Sales &amp; Business Development</h3><p>Warm up prospects with social selling and raise your SSI.</p></a><a href="personas.html#founder"><span class="e">🚀</span><h3>Founders &amp; Creators</h3><p>Build in public, grow an audience and turn it into customers and hires.</p></a><a href="personas.html#professional"><span class="e">🩺</span><h3>Doctors, Teachers &amp; Experts</h3><p>Share expertise simply and responsibly to build trust in your field.</p></a><a href="personas.html#recruiter"><span class="e">🧲</span><h3>Recruiters &amp; HR</h3><p>Employer branding, hiring posts and candidate outreach that gets replies.</p></a></div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+ <div class="sec-h"><h2>Run it your way</h2><p>Same app, same data, four ways in.</p></div>
+ <div class="ways">
+  <div><h3>Desktop app</h3><p>Install on Windows, macOS or Linux and it opens in its own window.</p><a class="btn sm p" href="download.html">Download</a></div>
+  <div><h3>Python</h3><p>One command, then open the portal in your browser.</p><pre style="padding:10px 12px;font-size:12.5px"><code>pip install git+https://github.com/jrnoorbaloch/linkedin-agent</code></pre></div>
+  <div><h3>Docker or cloud</h3><p>Self-host for a team, or deploy to Render or Railway.</p><a class="btn sm" href="self-hosting.html">Self-hosting guide</a></div>
+  <div><h3>Claude and MCP</h3><p>Use every skill from Claude, Claude Code, Cursor or any MCP client.</p><a class="btn sm" href="claude.html">Connect an agent</a></div>
+ </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+ <div class="sec-h"><h2>Straight about what LinkedIn allows</h2><p>No scraping and no browser bots, so your account isn't put at risk.</p></div>
+ <table><tr><th>What you want</th><th>Status</th><th>How LinkedIn Agent handles it</th></tr>
+ <tr><td>Post as yourself, with images or PDF carousels</td><td class="yes">Yes</td><td>Official “Share on LinkedIn” access, which any developer app gets</td></tr>
+ <tr><td>Add the first comment</td><td class="yes">Yes</td><td>Posted automatically right after your post</td></tr>
+ <tr><td>Post as a Company Page</td><td class="maybe">After approval</td><td>LinkedIn's Community Management API. Apply once, then switch it on</td></tr>
+ <tr><td>Edit your profile</td><td class="no">No API</td><td>The agent writes every section and you paste it in</td></tr>
+ <tr><td>Read your analytics</td><td class="no">Restricted</td><td>Import LinkedIn's analytics export and the agent learns from it</td></tr>
+ <tr><td>Send DMs and connection requests</td><td class="no">No API</td><td>The agent drafts them and you send them</td></tr></table>
+</div></section>
+
+<section class="dark-band"><div class="wrap final"><h2>Write less. Post more. Stay in charge.</h2><p>Free, open source and private by default. Your keys and your data stay on your machine.</p>
+ <div class="cta" style="justify-content:center"><a class="btn p" href="download.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg> Download LinkedIn Agent</a><a class="btn" href="https://github.com/jrnoorbaloch/linkedin-agent" style="background:transparent;color:#fff;border-color:#3a4a73"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.6 16 2.5a13.4 13.4 0 0 0-7 0C6.3.6 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/></svg> Star on GitHub</a></div></div></section>
+</main>
+<script>
+const tabs=[...document.querySelectorAll('[data-shot]')],img=document.getElementById('galimg'),cap=document.getElementById('galcap');
+tabs.forEach(b=>b.addEventListener('click',()=>{tabs.forEach(x=>x.setAttribute('aria-selected',x===b));img.src='assets/screens/'+b.dataset.shot+'.png';img.alt=b.textContent+' screen';cap.textContent=b.dataset.cap;}));
+</script><footer><div class="wrap">
+<div><a class="logo" href="index.html"><img src="assets/app-icon.png" alt="" width="30" height="30">LinkedIn Agent</a><p>Open-source and MIT licensed. Not affiliated with or endorsed by LinkedIn Corporation.</p></div>
+<div><h4>Product</h4><a href="features.html">Features</a><a href="screens.html">Screens</a><a href="personas.html">Persona packs</a><a href="demo/">Live demo</a><a href="download.html">Download</a></div>
+<div><h4>Docs</h4><a href="getting-started.html">Install</a><a href="skills.html">Skills</a><a href="claude.html">Claude & MCP</a><a href="api.html">API</a><a href="faq.html">FAQ</a></div>
+<div><h4>Project</h4><a href="https://github.com/jrnoorbaloch/linkedin-agent">GitHub</a><a href="https://github.com/jrnoorbaloch/linkedin-agent/releases">Releases</a><a href="https://github.com/jrnoorbaloch/linkedin-agent/issues">Issues</a><a href="changelog.html">Changelog</a><a href="sitemap.xml">Sitemap</a></div>
+</div></footer>
+</body></html>

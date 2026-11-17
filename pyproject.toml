@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "linkedin-agent"
-version = "0.1.0"
+version = "2.0.0"
 description = "Self-hosted, bring-your-own-LLM LinkedIn agent: daily posts, profile optimization, resumes and approval-gated publishing via LinkedIn's official API. Ships with a web portal, an MCP server and a Claude skill."
 readme = "README.md"
 license = { text = "MIT" }
@@ -24,13 +24,19 @@ dependencies = [
   "cryptography>=42",
   "python-docx>=1.1",
   "mcp>=1.2",
+  "reportlab>=4",
+  "openpyxl>=3.1",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+desktop = ["pywebview>=5"]
 
 [project.scripts]
 linkedin-agent = "linkedin_agent.cli:main"
+
+[project.gui-scripts]
+linkedin-agent-desktop = "linkedin_agent.desktop:main"
 
 [project.urls]
 Homepage = "https://jrnoorbaloch.github.io/linkedin-agent/"

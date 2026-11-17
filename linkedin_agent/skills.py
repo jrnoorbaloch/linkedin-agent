@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from . import db, llm
+from . import db, llm, notify
 
 # --------------------------------------------------------------------------
 # Brand profile (voice) — the context every skill writes from
@@ -34,12 +34,12 @@ PROFILE_FIELDS = [
 
 
 def get_brand() -> dict[str, str]:
-    return db.get_value("brand_profile", {}) or {}
+    return db.aget("brand_profile", {}) or {}
 
 
 def save_brand(data: dict[str, str]) -> dict[str, str]:
     clean = {k: str(data.get(k, "")).strip() for k, _ in PROFILE_FIELDS}
-    db.set_value("brand_profile", clean)
+    db.aset("brand_profile", clean)
     return clean
 
 
@@ -382,6 +382,98 @@ RESUME EDITS (exact bullet changes); PROFILE EDITS (headline/skills keywords to 
     ),
 ]
 
+SKILLS += [
+    # ---------------- v2: Content ----------------
+    Skill(
+        "trend_ideas", "Trend Ideas", "Content",
+        "Turn today's headlines from your RSS feeds into 5 post angles for your niche.",
+        """Using the trending headlines (if any) and the user's pillars, propose 5 post ideas.
+For each: the headline it reacts to, the user's angle (opinion/lesson/how-to), a hook (≤210 chars) and which pillar it fits.
+Prefer angles where the user has real experience (Story Bank).""",
+        [Field("focus", "Focus or niche (optional)")],
+        output="document",
+    ),
+    Skill(
+        "video_script", "Video Script", "Content",
+        "A 30-90 second LinkedIn video script with hook, beats, on-screen text and caption.",
+        """Write a talking-head video script: 0-3s hook line, 3-5 beats with on-screen text suggestions,
+a closing CTA, approximate timing per beat, B-roll ideas, and a 2-4 line caption post with first comment.""",
+        [Field("topic", "Video topic", "textarea", required=True), Field("length", "Length", "select", ["30s", "60s", "90s"])],
+        output="document",
+    ),
+    Skill(
+        "image_prompt", "Post Image Prompt", "Content",
+        "Describe the ideal image for a post and write a prompt for an image model.",
+        """Return: IMAGE CONCEPT (1-2 lines), PROMPT (one paragraph for an image model, no text in image unless short title,
+LinkedIn 1200x1200 or 1080x1350, brand-friendly, no logos/real people), ALT TEXT (≤120 chars).""",
+        [Field("post", "Post text", "textarea", required=True), Field("style", "Style", "select", ["clean illustration", "photo-realistic", "flat infographic", "3D render", "minimal typography"])],
+    ),
+    Skill(
+        "evergreen_recycle", "Evergreen Recycler", "Content",
+        "Rewrite your best-performing past posts with a fresh hook and angle.",
+        "For each top past post, write a NEW version: different hook formula, updated angle, same core insight. Format like Post Writer for each, separated by '==='.",
+        [Field("post", "Specific post to recycle (blank = your top posts)", "textarea")],
+        output="document",
+    ),
+    # ---------------- v2: Persona-specific ----------------
+    Skill(
+        "project_showcase", "Project Showcase", "Students & Developers",
+        "Turn a project, assignment, hackathon or GitHub repo into a post that recruiters notice.",
+        """Write a project post: the problem, what the user built (stack/tools), one hard part and how they solved it,
+the result (numbers or demo), what they learned, and a CTA (feedback / opportunities). Link (repo/demo) goes in FIRST COMMENT.""",
+        [Field("project", "Project details / README", "textarea", required=True), Field("link", "Repo or demo link")],
+        output="post",
+    ),
+    Skill(
+        "open_to_work", "Open-to-Work Post", "Job Seekers",
+        "A confident job-search announcement that gets referrals, not pity.",
+        """Write an open-to-work post: the role(s) and location/remote, 3 proof points (wins with numbers),
+what kind of team they want, an easy ask (intros/referrals), and contact info placeholder. Warm, not desperate. Also give a 2-line DM version for recruiters.""",
+        [Field("roles", "Target roles & location", required=True), Field("highlights", "Top achievements", "textarea")],
+        output="post",
+    ),
+    Skill(
+        "recruiter_outreach", "Recruiter / Candidate Outreach", "Recruiters & HR",
+        "Personalized InMail to a candidate (or to a recruiter) with a follow-up.",
+        "Write a personalized message (≤600 chars) that references the person's background, the role's best selling point and one question. Add a 4-day follow-up.",
+        [
+            Field("direction", "Direction", "select", ["recruiter → candidate", "candidate → recruiter"]),
+            Field("person", "Their profile summary", "textarea", required=True),
+            Field("role", "Role details", "textarea"),
+        ],
+    ),
+    Skill(
+        "social_selling", "Social Selling Planner", "Sales & Freelancers",
+        "Prospect research and a 14-day warm-up sequence from a pasted prospect profile.",
+        """From the prospect's profile/posts: 3 likely priorities, 3 conversation angles, a 14-day plan
+(day 1-5 engage on posts with comment ideas, day 6 connection note, day 9 value DM, day 14 soft ask), and SSI (Social Selling Index) tips.""",
+        [Field("prospect", "Prospect profile / recent posts", "textarea", required=True), Field("offer", "What you sell")],
+        output="document",
+    ),
+    Skill(
+        "case_study_post", "Client Case Study Post", "Sales & Freelancers",
+        "Turn a client win into a story post (with permission placeholders).",
+        "Write a before → turning point → after story with concrete numbers, what you did (3 steps), a client quote placeholder, and a soft CTA. Note where client permission is needed.",
+        [Field("project", "Client project details", "textarea", required=True)],
+        output="post",
+    ),
+    Skill(
+        "expert_explainer", "Expert Explainer", "Professionals",
+        "For doctors, teachers, lawyers, engineers: explain a common question simply and responsibly.",
+        """Explain the topic for a general audience: myth vs fact, 3-5 practical points, when to see a professional,
+and a responsible disclaimer where relevant (medical/legal/financial). No fear-mongering, no guarantees.""",
+        [Field("topic", "Topic / common question", "textarea", required=True), Field("profession", "Your profession")],
+        output="post",
+    ),
+    Skill(
+        "headline_ab", "Headline A/B Lab", "Profile",
+        "10 headline variants scored for clarity, searchability and curiosity.",
+        "Write 10 headline variants (≤220 chars) across styles (role-first, outcome-first, proof-first, niche, personality). Score each /10 on clarity, keywords, curiosity and recommend the top 2 to test for 2 weeks each.",
+        [Field("current", "Current headline"), Field("target", "Target audience / role")],
+        output="document",
+    ),
+]
+
 SKILL_MAP = {s.id: s for s in SKILLS}
 
 
@@ -420,6 +512,14 @@ def build_prompt(skill_id: str, inputs: dict[str, Any]) -> tuple[str, str]:
         parts.append("Samples: " + get_brand().get("sample_posts", ""))
     if skill_id in ("weekly_report", "daily_post"):
         parts.append(_metrics_block())
+    if skill_id in ("trend_ideas", "daily_post"):
+        items = db.list_rows("trends", limit=20)
+        if items:
+            parts.append("TRENDING HEADLINES (from the user's feeds):\n" + "\n".join(f"- {t['title']} ({t.get('source') or ''})" for t in items))
+    if skill_id == "evergreen_recycle" and not inputs.get("post"):
+        best = sorted(db.list_rows("posts", "status='published'", limit=100),
+                      key=lambda p: int((p.get("metrics") or {}).get("reactions") or 0) + 3 * int((p.get("metrics") or {}).get("comments") or 0), reverse=True)[:3]
+        parts.append("TOP PAST POSTS:\n" + "\n---\n".join(p["content"] for p in best) if best else "No past posts — ask the user to paste one.")
     if skill_id == "daily_post":
         recent = db.list_rows("posts", limit=7)
         parts.append("RECENT POSTS (avoid repeating):\n" + "\n".join(f"- {p.get('pillar')}: {p['content'][:100]!r}" for p in recent))
@@ -446,8 +546,10 @@ def run(skill_id: str, inputs: dict[str, Any] | None = None) -> dict[str, Any]:
             content=parsed["post"],
             first_comment=parsed.get("first_comment"),
             status="draft",
+            source="agent",
         )
         result.update(post_id=post_id, post=parsed["post"], first_comment=parsed.get("first_comment"))
+        notify.emit("draft_created", db.get("posts", post_id))
     elif skill.output == "document":
         kind = {"resume_builder": "resume", "cover_letter": "cover_letter", "profile_optimizer": "profile",
                 "content_planner": "plan"}.get(skill_id, "note")

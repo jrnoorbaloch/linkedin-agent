@@ -1,14 +1,14 @@
-"""LinkedIn official API client (OAuth 2.0 + Posts API).
+"""LinkedIn official API client (OAuth 2.0, Posts, Images, Documents).
 
 What the official API allows (and what this module implements):
 
 * Sign in with LinkedIn (OpenID Connect)      -> openid, profile, email     (self-serve)
-* Post / comment as yourself                   -> w_member_social           (self-serve, "Share on LinkedIn")
+* Post / comment as yourself (+ images, PDFs) -> w_member_social           (self-serve, "Share on LinkedIn")
 * Post as a Company Page                       -> w_organization_social     (needs Community Management API approval)
 
-What it does NOT allow: editing profile sections (headline, About, experience)
-or reading your past posts (r_member_social is closed). The agent therefore
-*writes* profile copy for you to paste, and tracks post metrics you enter.
+Not available: editing profile sections, reading your past posts (r_member_social
+is closed), DMs or connection requests. The agent writes that copy for you to
+paste, and imports history/analytics from LinkedIn's own data export.
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from __future__ import annotations
 import re
 import secrets
 import time
+from pathlib import Path
 from urllib.parse import quote, urlencode
 
 import httpx
@@ -46,8 +47,8 @@ def _headers(token: str) -> dict[str, str]:
 def authorization_url() -> str:
     if not settings.linkedin_client_id:
         raise LinkedInError("LINKEDIN_CLIENT_ID is not set. See docs: Getting started → LinkedIn app.")
-    state = secrets.token_urlsafe(24)
-    db.set_value("oauth_state", state)
+    state = f"{db.current_account()}.{secrets.token_urlsafe(24)}"
+    db.set_value(f"oauth_state:{state}", int(time.time()))
     params = {
         "response_type": "code",
         "client_id": settings.linkedin_client_id,
@@ -59,10 +60,11 @@ def authorization_url() -> str:
 
 
 def handle_callback(code: str, state: str) -> dict:
-    expected = db.get_value("oauth_state")
-    if not expected or not secrets.compare_digest(expected, state):
-        raise LinkedInError("OAuth state mismatch. Please try connecting again.")
-    db.delete_value("oauth_state")
+    issued = db.get_value(f"oauth_state:{state}")
+    if not issued or time.time() - int(issued) > 900:
+        raise LinkedInError("OAuth state mismatch or expired. Please try connecting again.")
+    db.delete_value(f"oauth_state:{state}")
+    account_id = int(state.split(".", 1)[0])
     r = httpx.post(
         TOKEN_URL,
         data={
@@ -78,14 +80,15 @@ def handle_callback(code: str, state: str) -> dict:
         raise LinkedInError(f"Token exchange failed: {r.text[:300]}")
     tok = r.json()
     tok["obtained_at"] = int(time.time())
-    db.set_value("linkedin_token", tok, secret=True)
-    me = userinfo(tok["access_token"])
-    db.set_value("linkedin_member", me)
+    with db.use_account(account_id):
+        db.aset("linkedin_token", tok, secret=True)
+        me = userinfo(tok["access_token"])
+        db.aset("linkedin_member", me)
     return me
 
 
 def _token() -> str:
-    tok = db.get_value("linkedin_token")
+    tok = db.aget("linkedin_token")
     if not tok:
         raise LinkedInError("LinkedIn is not connected. Open the portal and click 'Connect LinkedIn'.")
     expires = tok.get("obtained_at", 0) + int(tok.get("expires_in", 0))
@@ -103,12 +106,8 @@ def _refresh(tok: dict) -> str | None:
         return None
     r = httpx.post(
         TOKEN_URL,
-        data={
-            "grant_type": "refresh_token",
-            "refresh_token": rt,
-            "client_id": settings.linkedin_client_id,
-            "client_secret": settings.linkedin_client_secret,
-        },
+        data={"grant_type": "refresh_token", "refresh_token": rt,
+              "client_id": settings.linkedin_client_id, "client_secret": settings.linkedin_client_secret},
         timeout=30,
     )
     if r.status_code != 200:
@@ -116,28 +115,29 @@ def _refresh(tok: dict) -> str | None:
     new = r.json()
     new["obtained_at"] = int(time.time())
     new.setdefault("refresh_token", rt)
-    db.set_value("linkedin_token", new, secret=True)
+    db.aset("linkedin_token", new, secret=True)
     return new["access_token"]
 
 
 def status() -> dict:
-    tok = db.get_value("linkedin_token")
-    member = db.get_value("linkedin_member")
+    tok = db.aget("linkedin_token")
+    member = db.aget("linkedin_member")
     if not tok:
-        return {"connected": False, "org_enabled": settings.linkedin_org_enabled}
+        return {"connected": False, "org_enabled": settings.linkedin_org_enabled, "configured": bool(settings.linkedin_client_id)}
     expires_at = tok.get("obtained_at", 0) + int(tok.get("expires_in", 0))
     return {
         "connected": True,
+        "configured": True,
         "member": member,
         "expires_in_days": max(0, int((expires_at - time.time()) / 86400)),
         "org_enabled": settings.linkedin_org_enabled,
-        "organizations": db.get_value("linkedin_orgs", []),
+        "organizations": db.aget("linkedin_orgs", []),
     }
 
 
 def disconnect() -> None:
     for k in ("linkedin_token", "linkedin_member", "linkedin_orgs"):
-        db.delete_value(k)
+        db.adelete(k)
 
 
 def userinfo(token: str | None = None) -> dict:
@@ -148,7 +148,7 @@ def userinfo(token: str | None = None) -> dict:
 
 
 def member_urn() -> str:
-    member = db.get_value("linkedin_member") or {}
+    member = db.aget("linkedin_member") or {}
     sub = member.get("sub")
     if not sub:
         raise LinkedInError("LinkedIn member id unknown. Reconnect LinkedIn.")
@@ -158,30 +158,53 @@ def member_urn() -> str:
 # ---------------- Organizations (Company Pages) ----------------
 
 def list_admin_organizations() -> list[dict]:
-    """Pages the member administers. Requires Community Management API access."""
     if not settings.linkedin_org_enabled:
         raise LinkedInError("Company Page support is off. Set LINKEDIN_ORG_ENABLED=1 after LinkedIn approves your app.")
-    token = _token()
     r = httpx.get(
         f"{API}/rest/organizationAcls",
         params={"q": "roleAssignee", "role": "ADMINISTRATOR", "state": "APPROVED"},
-        headers=_headers(token),
+        headers=_headers(_token()),
         timeout=30,
     )
     if r.status_code != 200:
         raise LinkedInError(f"organizationAcls failed: {r.text[:300]}")
     orgs = [{"urn": e["organization"]} for e in r.json().get("elements", [])]
-    db.set_value("linkedin_orgs", orgs)
+    db.aset("linkedin_orgs", orgs)
     return orgs
+
+
+# ---------------- Media upload ----------------
+
+def _upload(kind: str, path: Path, owner: str) -> str:
+    """kind = 'images' | 'documents'. Returns the media URN."""
+    token = _token()
+    r = httpx.post(
+        f"{API}/rest/{kind}?action=initializeUpload",
+        headers=_headers(token),
+        json={"initializeUploadRequest": {"owner": owner}},
+        timeout=30,
+    )
+    if r.status_code not in (200, 201):
+        raise LinkedInError(f"{kind} initializeUpload failed: {r.text[:300]}")
+    value = r.json()["value"]
+    upload_url = value["uploadUrl"]
+    urn = value.get("image") or value.get("document")
+    put = httpx.put(upload_url, content=path.read_bytes(), headers={"Authorization": f"Bearer {token}"}, timeout=120)
+    if put.status_code not in (200, 201):
+        raise LinkedInError(f"{kind} upload failed ({put.status_code}): {put.text[:300]}")
+    return urn
 
 
 # ---------------- Posting ----------------
 
-def create_post(text: str, author_urn: str | None = None) -> str:
-    """Publish a text post. Returns the post URN (x-restli-id header)."""
+def create_post(text: str, author_urn: str | None = None, media: dict | None = None) -> str:
+    """Publish a post (optionally with an image or PDF document). Returns the post URN.
+
+    ``media`` = {"kind": "image"|"pdf", "path": str, "title": str}
+    """
     token = _token()
     author = author_urn or member_urn()
-    body = {
+    body: dict = {
         "author": author,
         "commentary": escape_little_text(text),
         "visibility": "PUBLIC",
@@ -189,7 +212,15 @@ def create_post(text: str, author_urn: str | None = None) -> str:
         "lifecycleState": "PUBLISHED",
         "isReshareDisabledByAuthor": False,
     }
-    r = httpx.post(f"{API}/rest/posts", headers=_headers(token), json=body, timeout=30)
+    if media:
+        path = Path(media["path"])
+        if media["kind"] == "image":
+            urn = _upload("images", path, author)
+            body["content"] = {"media": {"id": urn, "altText": (media.get("title") or "")[:4086]}}
+        else:
+            urn = _upload("documents", path, author)
+            body["content"] = {"media": {"id": urn, "title": media.get("title") or "Document"}}
+    r = httpx.post(f"{API}/rest/posts", headers=_headers(token), json=body, timeout=60)
     if r.status_code not in (200, 201):
         raise LinkedInError(f"Post failed ({r.status_code}): {r.text[:400]}")
     return r.headers.get("x-restli-id", "")
@@ -209,8 +240,6 @@ def create_comment(post_urn: str, text: str, actor_urn: str | None = None) -> No
 
 
 _LITTLE_RESERVED = set("\\|{}@[]()<>#*_~")
-
-
 _HASHTAG = re.compile(r"(?<![\w#])#([A-Za-z0-9_]+)")
 
 

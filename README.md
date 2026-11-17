@@ -1,94 +1,80 @@
 <div align="center">
 
+<img src="docs/assets/app-icon.png" width="84" alt="LinkedIn Agent icon">
+
 # LinkedIn Agent
 
-**Open-source AI agent for LinkedIn: daily posts, profile optimization, resumes and approval-gated publishing. Bring your own LLM.**
+**Your LinkedIn, written for you. Posted only when you say so.**
 
-Web portal · MCP server · Claude skill & subagent
+An open-source AI agent that drafts a post every morning in your voice, rewrites your profile, builds your resume and publishes through LinkedIn's official API once you approve. You can use any AI model. It ships as a desktop app, a web portal, Docker, an MCP server and a Claude skill.
 
-[Documentation](https://jrnoorbaloch.github.io/linkedin-agent/) · [Live UI demo](https://jrnoorbaloch.github.io/linkedin-agent/demo/) · [Getting started](https://jrnoorbaloch.github.io/linkedin-agent/getting-started.html) · [Skills](https://jrnoorbaloch.github.io/linkedin-agent/skills.html)
+[Website](https://jrnoorbaloch.github.io/linkedin-agent/) · [Download](https://jrnoorbaloch.github.io/linkedin-agent/download.html) · [Live demo](https://jrnoorbaloch.github.io/linkedin-agent/demo/) · [Screens](https://jrnoorbaloch.github.io/linkedin-agent/screens.html) · [Docs](https://jrnoorbaloch.github.io/linkedin-agent/docs.html)
 
-![LinkedIn Agent dashboard](docs/assets/ui-dashboard.png)
+![LinkedIn Agent dashboard](docs/assets/screens/dashboard.png)
 
 </div>
 
-## What it does
+## What's new in v2
 
-- **Drafts a post every morning** from your content pillars and Story Bank, then waits for your approval.
-- **Publishes through LinkedIn's official API**: posts plus an automatic first comment, and Company Pages once LinkedIn approves your app.
-- **Works with any LLM**: OpenAI, Claude, Gemini, Groq, OpenRouter, DeepSeek, any OpenAI-compatible endpoint, or a local Ollama model.
-- **28 skills**: post writer (20 hook formulas), humanizer, carousel, poll, article, repurposer, comment and reply drafter, connection notes, DMs, recommendations, profile optimizer, voice builder, story interviewer, resume (DOCX export), cover letter, job match, interview prep, skills gap, salary negotiation, Company Page posts, hiring posts, employee advocacy, weekly report and competitor analysis.
-- **Approval-gated**: the API refuses to publish anything you haven't approved.
-- **Private**: SQLite on your machine, with API keys and OAuth tokens encrypted at rest.
+- **Desktop app:** a Windows installer, a macOS app and a Linux build. Installers are built automatically for every release.
+- **New interface:**
+  - an approval board
+  - a post editor with a live LinkedIn preview that shows where "see more" cuts
+  - a drag-to-reschedule calendar
+  - a command palette
+  - dark mode
+  - **5 languages** (English, Urdu, Hindi, Arabic, Spanish), with right-to-left layouts for Urdu and Arabic
+- **One-drop setup:** import LinkedIn's own data export. It fills your profile, voice and post history.
+- **8 persona packs:** students, job seekers, developers, freelancers, sales, founders, doctors/teachers/experts, and recruiters.
+- **39 skills,** 11 of them new: trend ideas, video script, image prompt, evergreen recycler, project showcase, open-to-work, recruiter outreach, social selling, case study, expert explainer and headline A/B.
+- **Images and PDF carousels:** posted with LinkedIn's Images and Documents APIs.
+- **Analytics:** import LinkedIn's analytics export to get a weekday × hour heatmap, best posting slots, and results by hook and pillar.
+- **Teams:** workspaces for several accounts and clients, admin/editor/reviewer roles, and signed client review links.
+- **Phone approvals:** approve from Telegram buttons or WhatsApp replies. Slack, webhooks (Zapier/Make/n8n), a calendar subscription and CSV export are also available.
+- **Distribution:** a Docker image on GHCR, one-click Render and Railway configs, and CI.
 
-## Quick start
-
-```bash
-pip install git+https://github.com/jrnoorbaloch/linkedin-agent
-linkedin-agent serve            # → http://localhost:8787
-```
-
-Or with Docker:
-
-```bash
-git clone https://github.com/jrnoorbaloch/linkedin-agent && cd linkedin-agent
-cp .env.example .env            # add your LinkedIn app credentials
-docker compose up -d
-```
-
-Then:
-
-1. Create a LinkedIn developer app with the **Sign In with LinkedIn (OpenID Connect)** and **Share on LinkedIn** products.
-2. Set the redirect URL to `http://localhost:8787/auth/linkedin/callback`.
-3. Put the Client ID and Client Secret in `.env`.
-4. In the portal, connect LinkedIn and your LLM, fill your brand profile, and draft your first post.
-
-Full guide: [Getting started](https://jrnoorbaloch.github.io/linkedin-agent/getting-started.html).
-
-## Use it from Claude or any AI agent
+## Install
 
 | | |
 |---|---|
-| **Claude skill** | `skill/linkedin-agent/`: one skill with 13 playbooks. Upload [`linkedin-agent-skill.zip`](docs/downloads/linkedin-agent-skill.zip) in Claude, or copy the folder to `~/.claude/skills/`. |
-| **Subagent** | `agents/linkedin-agent.md`: a LinkedIn manager for Claude Code (daily post, weekly plan, profile overhaul, weekly review). |
-| **MCP server** | `linkedin-agent mcp`, for Claude Desktop, Claude Code, Cursor or any MCP client. |
+| **Windows / macOS / Linux** | [Download the app](https://jrnoorbaloch.github.io/linkedin-agent/download.html) |
+| **Python 3.10+** | `pip install git+https://github.com/jrnoorbaloch/linkedin-agent` → `linkedin-agent serve` or `linkedin-agent-desktop` |
+| **Docker** | `docker run -p 8787:8787 -v la-data:/data --env-file .env ghcr.io/jrnoorbaloch/linkedin-agent` |
 
-```json
-{ "mcpServers": { "linkedin-agent": { "command": "linkedin-agent", "args": ["mcp"] } } }
-```
+Then follow [Install & set up](https://jrnoorbaloch.github.io/linkedin-agent/getting-started.html):
+
+1. Connect a model.
+2. Import your LinkedIn data.
+3. Pick a pack.
+4. [Create your LinkedIn app](https://jrnoorbaloch.github.io/linkedin-agent/linkedin-app.html) and connect it.
+
+## Use it from Claude or any AI agent
+
+- **Claude skill:** `skill/linkedin-agent/`. You can also [download the ZIP](docs/downloads/linkedin-agent-skill.zip) and upload it in Claude.
+- **Subagent:** `agents/linkedin-agent.md` (for Claude Code).
+- **MCP server:** `linkedin-agent mcp` exposes 25 tools. In Claude Code, run `claude mcp add linkedin-agent -- linkedin-agent mcp`.
 
 ## What LinkedIn's API allows
 
 | Capability | Status |
 |---|---|
-| Post and first-comment as yourself | ✅ Self-serve (`w_member_social`) |
+| Post as yourself (text, image, PDF carousel) + first comment | ✅ Self-serve |
 | Post as a Company Page | ✅ After Community Management API approval |
 | Edit your profile | ❌ No API. The agent writes the copy and you paste it |
-| Read post analytics | ❌ Restricted. Enter the numbers in History |
-| DMs and connection requests | ❌ No API. The agent drafts and you send |
+| Read analytics | ❌ Restricted. Import LinkedIn's export instead |
+| DMs and connection requests | ❌ No API. The agent drafts them and you send them |
 
-There is no scraping and no browser automation.
-
-## Project layout
-
-```
-linkedin_agent/      core: skills registry, LLM client, LinkedIn API, scheduler, FastAPI, MCP server
-  static/index.html  the web portal (single file)
-skill/linkedin-agent Claude skill (SKILL.md + references + scripts)
-agents/              Claude Code subagent
-docs/                documentation site (GitHub Pages) + live demo
-tools/               build scripts for the demo and docs
-tests/               pytest suite
-```
+The agent doesn't scrape and doesn't drive a browser, so your account isn't put at risk.
 
 ## Development
 
 ```bash
-pip install -e '.[dev]' && pytest
-python tools/build_demo.py && python tools/build_docs.py   # rebuild docs/
+pip install -e '.[dev,desktop]' && pytest -q
+python tools/build_demo.py && python tools/build_docs.py     # regenerate docs/
+pyinstaller packaging/linkedin-agent.spec --noconfirm       # desktop build
 ```
 
-Add a skill by appending to `SKILLS` in `linkedin_agent/skills.py`. The portal, REST API and MCP server pick it up automatically.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Releases are made by pushing a `v*` tag, which builds the installers, the Docker image and the Python packages.
 
 ## License
 

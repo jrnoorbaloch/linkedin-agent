@@ -1,0 +1,84 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: write
+  packages: write
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+          - os: macos-latest
+            name: macos
+          - os: ubuntu-22.04
+            name: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        shell: bash
+        run: |
+          pip install . pyinstaller
+          if [ "${{ matrix.name }}" != "linux" ]; then pip install pywebview; fi
+      - name: Build app
+        run: pyinstaller packaging/linkedin-agent.spec --noconfirm
+      - name: Package (Windows installer)
+        if: matrix.name == 'windows'
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          $env:APP_VERSION = "${{ github.ref_name }}".TrimStart("v")
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging\installer.iss
+          Compress-Archive -Path "dist\LinkedIn Agent\*" -DestinationPath "dist\LinkedIn-Agent-Windows-portable.zip"
+      - name: Package (macOS dmg)
+        if: matrix.name == 'macos'
+        run: |
+          hdiutil create -volname "LinkedIn Agent" -srcfolder "dist/LinkedIn Agent.app" -ov -format UDZO "dist/LinkedIn-Agent-macOS.dmg"
+      - name: Package (Linux)
+        if: matrix.name == 'linux'
+        run: tar -czf "dist/LinkedIn-Agent-Linux.tar.gz" -C dist "LinkedIn Agent"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/LinkedIn-Agent-Setup.exe
+            dist/LinkedIn-Agent-Windows-portable.zip
+            dist/LinkedIn-Agent-macOS.dmg
+            dist/LinkedIn-Agent-Linux.tar.gz
+          fail_on_unmatched_files: false
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/linkedin-agent:latest
+            ghcr.io/${{ github.repository_owner }}/linkedin-agent:${{ github.ref_name }}
+
+  pypi-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build && python -m build
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

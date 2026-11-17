@@ -1,7 +1,8 @@
 import os
 import tempfile
 
-os.environ["LA_DATA_DIR"] = tempfile.mkdtemp()
+os.environ.setdefault("LA_DATA_DIR", tempfile.mkdtemp())
+os.environ["LA_DISABLE_SCHEDULER"] = "1"
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -44,7 +45,7 @@ def test_secrets_encrypted():
 def test_api_flow(monkeypatch):
     monkeypatch.setattr(llm, "complete", fake_complete)
     published = {}
-    monkeypatch.setattr(linkedin, "create_post", lambda text, author_urn=None: published.setdefault("urn", "urn:li:share:1"))
+    monkeypatch.setattr(linkedin, "create_post", lambda text, author_urn=None, media=None: published.setdefault("urn", "urn:li:share:1"))
     monkeypatch.setattr(linkedin, "create_comment", lambda *a, **k: None)
     with TestClient(app) as c:
         assert c.get("/api/health").json()["ok"]

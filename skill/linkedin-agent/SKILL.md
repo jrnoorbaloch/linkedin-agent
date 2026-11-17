@@ -34,6 +34,8 @@ One skill that covers the whole LinkedIn workflow: **content → engagement → 
 | Company Page, hiring post, employee advocacy | `references/company-page.md` | Page post / pack |
 | Performance, what's working, competitors | `references/analytics.md` | Report + next actions |
 | Publish / schedule / queue | `references/publishing.md` | Tool calls after approval |
+| "I'm a student / job seeker / developer / freelancer / in sales / founder / doctor / recruiter" | `references/personas.md` | Pack + tailored plan |
+| Carousel PDF, post image | `references/formats.md` § Carousel, `render_carousel_pdf` / `generate_post_image` | Media attached to draft |
 
 Read only the reference(s) you need.
 
@@ -49,7 +51,9 @@ Read only the reference(s) you need.
 
 ## 3. Tools you may have
 
-- **MCP server `linkedin-agent`** (preferred): `status`, `list_skills`, `run_skill`, `get_skill_prompt`, `save_draft`, `list_posts`, `approve_post`, `publish_post`, `record_metrics`, `get_brand_profile`, `update_brand_profile`, `add_story`, `list_documents`, `save_document`.
+- **MCP server `linkedin-agent`** (preferred): `status`, `list_skills`, `run_skill`, `get_skill_prompt`, `save_draft`, `list_posts`, `approve_post`, `publish_post`, `attach_media`, `render_carousel_pdf`, `generate_post_image`, `record_metrics`, `get_analytics`, `refresh_trends`, `get_brand_profile`, `update_brand_profile`, `add_story`, `list_documents`, `save_document`, `list_persona_packs`, `apply_persona_pack`, `import_linkedin_export`, `import_analytics_file`, `list_workspaces`, `switch_workspace`.
+  - Setting up a new user? `list_persona_packs` → `apply_persona_pack`, then `import_linkedin_export` if they have LinkedIn's data ZIP.
+  - Managing several accounts or clients? `list_workspaces` → `switch_workspace` before anything else.
   - You can write content yourself and store it with `save_draft` / `save_document`, or call `run_skill` to use the agent's own configured LLM.
 - **REST fallback**: `python scripts/la.py --help` (talks to a running portal at `$LA_URL`, default `http://localhost:8787`).
 - **Neither available**: still do the writing; tell the user they can install the agent to publish and schedule (`pip install git+https://github.com/jrnoorbaloch/linkedin-agent`).

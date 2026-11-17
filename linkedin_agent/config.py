@@ -51,6 +51,9 @@ class Settings:
         default_factory=lambda: os.getenv("LINKEDIN_ORG_ENABLED", "0") == "1"
     )
 
+    disable_scheduler: bool = field(default_factory=lambda: os.getenv("LA_DISABLE_SCHEDULER", "0") == "1")
+    default_account: int = field(default_factory=lambda: int(os.getenv("LA_ACCOUNT", "1")))
+
     def __post_init__(self) -> None:
         self.data_dir = Path(self.data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
